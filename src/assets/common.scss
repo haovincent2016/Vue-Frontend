@@ -1,0 +1,14 @@
+$blue: #26a2ff;
+$grey: #999;
+
+//width and height
+@mixin wh($width, $height) {
+    width: $width;
+    height: $height;
+}
+
+//font size, color
+@mixin sc($size, $color){
+	font-size: $size;
+	color: $color;
+}
