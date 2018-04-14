@@ -8,7 +8,16 @@ import mutations from './mutations'
 Vue.use(Vuex)
 
 const state = {
-  something: ''
+  //user info
+  userInfo: {},
+  //is user login
+  isLogin: false,
+  //shop id
+  shop: null,
+  //cart id
+  cart: null,
+  //all items added to cart
+  cartItems: {}
 }
 
 export default new Vuex.Store({

@@ -1,6 +1,39 @@
 <template>
 	<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" style="position:absolute;width:0;height:0;visibility:hidden">
 		<defs>
+			<symbol viewBox="0 0 375 603" id="shop-loading">
+			<g fill="none" fill-rule="evenodd" transform="translate(-2)">
+        <path fill="#FFF" d="M2 69h375v534H2z"/>
+        <path fill="#EEE" d="M2 0h375v69H2z"/>
+        <rect width="66" height="66" x="157" y="23" fill="#F6F6F6" rx="2"/>
+        <path fill="#EEE" d="M65 99h250v24H65zm0 31h250v13H65z"/>
+        <path fill="#F6F6F6" d="M65 150h250v13H65zM2 300h77v303H2z"/>
+        <path stroke="#F6F6F6" d="M26.5 172.5h326v28h-326z"/>
+        <path fill="#EEE" d="M50 180h280v13H50z"/>
+        <path stroke="#F6F6F6" stroke-linecap="square" d="M.5 248.5h379.005"/>
+        <g transform="translate(88 278)">
+          <path fill="#EEE" d="M267 82v-3.998a.999.999 0 1 0-2 0V82h-3.998a.999.999 0 1 0 0 2H265v3.998a.999.999 0 1 0 2 0V84h3.998a.999.999 0 1 0 0-2H267zm-1 12c-6.075 0-11-4.925-11-11s4.925-11 11-11 11 4.925 11 11-4.925 11-11 11z"/>
+          <rect width="74" height="74" x="1" y="13" fill="#F6F6F6" rx="2"/>
+          <path fill="#EEE" d="M87 13h140v16H87zm0 25h126v11H87zm0 31h33v18H87z"/>
+          <path stroke="#F6F6F6" stroke-linecap="square" d="M.473 1.5h293.032"/>
+        </g>
+        <g transform="translate(88 393)">
+          <path fill="#EEE" d="M267 82v-3.998a.999.999 0 1 0-2 0V82h-3.998a.999.999 0 1 0 0 2H265v3.998a.999.999 0 1 0 2 0V84h3.998a.999.999 0 1 0 0-2H267zm-1 12c-6.075 0-11-4.925-11-11s4.925-11 11-11 11 4.925 11 11-4.925 11-11 11z"/>
+          <rect width="74" height="74" x="1" y="13" fill="#F6F6F6" rx="2"/>
+          <path fill="#EEE" d="M87 13h140v16H87zm0 25h126v11H87zm0 31h33v18H87z"/>
+          <path stroke="#F6F6F6" stroke-linecap="square" d="M.473 1.5h293.032"/>
+        </g>
+        <g transform="translate(88 509)">
+          <path fill="#EEE" d="M267 82v-3.998a.999.999 0 1 0-2 0V82h-3.998a.999.999 0 1 0 0 2H265v3.998a.999.999 0 1 0 2 0V84h3.998a.999.999 0 1 0 0-2H267zm-1 12c-6.075 0-11-4.925-11-11s4.925-11 11-11 11 4.925 11 11-4.925 11-11 11z"/>
+          <rect width="74" height="74" x="1" y="13" fill="#F6F6F6" rx="2"/>
+          <path fill="#EEE" d="M87 13h140v16H87zm0 25h126v11H87zm0 31h33v18H87z"/>
+          <path stroke="#F6F6F6" stroke-linecap="square" d="M.473 1.5h293.032"/>
+        </g>
+        <path fill="#EEE" d="M50 222h29v16H50zm39 35h29v16H89zM9 267h50v15H9zm0 54h50v15H9zm0 49h50v15H9zm0 101h50v15H9zm0-49h50v15H9zm0 101h50v15H9zm0 50h50v15H9zm166-351h29v16h-29zm126 0h29v16h-29z"/>
+        <path fill="#F5F5F5" d="M2 556h375v47H2z"/>
+      </g>
+			</symbol>
+
 			<symbol viewBox="0 0 60 60" id="eleme">
 			<path fill="#3CABFF" fill-rule="evenodd" d="M0 9.375A9.374 9.374 0 0 1 9.375 0h41.25A9.374 9.374 0 0 1 60 9.375v41.25A9.374 9.374 0 0 1 50.625 60H9.375A9.374 9.374 0 0 1 0 50.625V9.375zm35.94 30.204c-5.601 3.147-12.645 1.256-15.834-4.217-3.206-5.501-1.303-12.537 4.25-15.713 4.7-2.689 10.51-1.749 14.127 1.941L27.526 27.89a2.81 2.81 0 0 0-1.037 3.854 2.862 2.862 0 0 0 3.887 1.035l15.988-9.166a17.238 17.238 0 0 0-1.222-2.571c-4.777-8.198-15.358-11.007-23.632-6.275-8.275 4.734-11.11 15.217-6.332 23.415 4.77 8.184 15.322 10.997 23.59 6.297.877-.5 1.654-1.037 2.376-1.623l-1.31-2.248a2.868 2.868 0 0 0-3.893-1.028zm10.824-7.39l-1.418-2.425-4.911 2.798 2.835 4.846 2.454-1.399h.002a2.779 2.779 0 0 0 1.038-3.82z">
 			</path>
