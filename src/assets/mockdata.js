@@ -9,11 +9,11 @@ export const foods = [{
     description: 'very delicious',
     image: '/static/foods/shop1/cake.jpeg',
     //ratings
-    month_sales: 0,
+    month_sales: 201,
     rating: 0,
 	rating_count: 0,
-    satisfy_count: 0,
-    satisfy_rate: 0,
+    satisfy_count: 1,
+    satisfy_rate: 90,
     //specs
 	specs: [{
         //required
@@ -41,11 +41,11 @@ export const foods = [{
     description: 'very delicious too',
     image: '/static/foods/shop1/cake2.jpeg',
     //ratings
-    month_sales: 0,
+    month_sales: 13,
     rating: 0,
 	rating_count: 0,
     satisfy_count: 0,
-    satisfy_rate: 0,
+    satisfy_rate: 48,
     //specs
 	specs: [{
         //required
@@ -61,5 +61,46 @@ export const foods = [{
         stock: 30,
 		promotion_stock: 2,
         sold_out: false
+    }, {
+        //required
+		sku: 103,
+		name: 'strawberry flavor',
+        specs_id: 2,
+        //price and fee
+        original_price: 39,
+        price: 39,
+		packing_fee: 1,
+        
+        rating: 0,
+        stock: 40,
+		promotion_stock: 5,
+        sold_out: false
     }]
 }]
+
+export const shop = {
+    //shop id
+    id: 1,
+    //shop name
+    name: 'vincent\'s cake',
+    //shop address
+    address: 'CF Richmond Centre floor 1, section 1038',
+    //shop desc
+    description: "No description yet~",
+    //minimum order total money
+    minimum_order_amount: 35,
+    //shop category
+    category: 'Cake',
+    //shop identification, license for selling
+    //shop image
+    image: '/static/shops/shop.jpeg',
+    //shop location
+	latitude: 101,
+	longitude: 38,
+	opening_hours: ["08:30/20:30"],
+	phone: '7789551234',
+	rating: 5,
+	rating_count: 10,
+	order_number: 100,
+	status: 1
+}

@@ -31,7 +31,9 @@
         <span class="header-desc">hot cakes are here</span>
       </div>
       <ul>
+        <!-- all menu items -->
         <li v-for="(item, index) in menu" :key="index">
+          <!-- foods per menu -->
           <div class="food-list" v-for="(food, foodIndex) in item.foods" :key="foodIndex">
             <div class="food-image">
               <img :src="food.image" >
@@ -39,10 +41,9 @@
             <div class="food-desc">
               <p class="desc-name">{{ food.name }}</p>
               <p class="desc-content">{{ food.description }}</p>
-              <p class="desc-rating">
-                <span v-if="food.month_sales">sold {{ food.month_sales }} items</span>
-                <span v-if="food.month_sales">{{ food.satisfy_rate }}% satisfied customers</span>
-              </p>
+              <p class="desc-sale" v-if="food.month_sales">sold<span class="highlight">{{ food.month_sales }}</span>items<i v-if="food.month_sales > 100" class="far fa-thumbs-up"></i></p>
+              <p class="desc-rating" v-if="food.satisfy_rate && food.satisfy_rate > 50"><span class="positive">{{ food.satisfy_rate }}%</span>satisfied customers</p>
+              <p class="desc-rating" v-if="food.satisfy_rate && food.satisfy_rate <= 50"><span class="negative">{{ food.satisfy_rate }}%</span>satisfied customers</p>
               <strong class="food-price">
               <span>${{ food.specs[0].price }}</span>
               </strong>
@@ -51,6 +52,7 @@
                 :shopId = 'shopId' 
                 :food = 'food' 
                 @showMovingDot = "showMovingDotFunc"
+                @showSpecsPopup = "toggleSpecs"
               />
             </div>
           </div>
@@ -58,9 +60,39 @@
       </ul>
     </section>
   </div>
+  <!-- food specs selection popup -->
+  <transition name="show-popup">
+    <div class="specs-popup" v-if="showSpecs">
+        <header class="popup-header">
+          <h4 class="header-title">{{selectedFood.name}}</h4>
+          <svg width="16" height="16" xmlns="http://www.w3.org/2000/svg" version="1.1" class="header-cancel" @click="toggleSpecs">
+              <line x1="0" y1="0" x2="16" y2="16"  stroke="#666" stroke-width="1.2"/>
+              <line x1="0" y1="16" x2="16" y2="0"  stroke="#666" stroke-width="1.2"/>
+          </svg>
+        </header>
+        <section class="popup-content">
+          <ul>
+            <li v-for="(item, itemIndex) in selectedFood.specs" 
+              :class="{isSelected: itemIndex === specsIndex}" 
+              @click="selectSpecs(itemIndex)"
+              :key="itemIndex">
+              <div class="conten-title">{{ item.name }}</div>
+            </li>
+          </ul>
+        </section>
+        <footer class="specs-footer">
+            <div class="footer-price">
+              <span>${{selectedFood.specs[specsIndex].price}}</span>
+            </div>
+            <div class="footer-add" @click="addSpecs(selectedFood.category_id, selectedFood.item_id, selectedFood.specs[specsIndex].specs_id, selectedFood.name, selectedFood.specs[specsIndex].name, selectedFood.specs[specsIndex].price, selectedFood.specs[specsIndex].sku)">
+              <span>Add Cart</span>
+            </div>
+        </footer>
+    </div>
+  </transition>
   <!-- shopping cart, reset for different shops -->
   <div class="shop-cart" @click="toggleCartList">
-    <div class="cart-icon-wrapper">
+    <div class="cart-icon-wrapper" :class="{'not-empty': totalNumber > 0}">
       <span class="cart-items">{{ totalNumber }}</span>
       <svg class="cart-icon">
         <use xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="#cart-icon"></use>
@@ -68,6 +100,10 @@
     </div>
     <div class="cart-price">
       <span>${{ totalPrice }}</span>
+    </div>
+    <div class="check-out" :class="{'checkout-highlight': minimumTotal <= 0}">
+      <span v-if="minimumTotal > 0" class="checkout-notice">need ${{ minimumTotal }} more</span>
+      <router-link v-else :to="{path: '/checkout'}" class="checkout-button">Checkout</router-link>
     </div>
   </div>
   <!-- shopping cart detail -->
@@ -81,13 +117,13 @@
         <ul>
           <li v-for="(item, index) in cartList" :key="index" class="list-item">
             <span class="list-item-name">{{ item.name }}</span>
-            <span class="list-item-price">{{ item.specs[0].price * item.number }}</span>
+            <span class="list-item-price">${{ item.price * item.number }}</span>
             <span class="list-item-buttons">
-              <svg @click="decreaseItem(item.category_id, item.item_id, item.name, item.specs)">
+              <svg @click="decreaseItem(item.category_id, item.item_id, item.specs_id)">
                 <use xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="#cart-minus"></use>
               </svg>
               <span class="list-item-number">{{ item.number }}</span>
-              <svg @click="increaseItem(item.category_id, item.item_id, item.name, item.specs)">
+              <svg @click="increaseItem(item.category_id, item.item_id, item.specs_id, item.name, item.specs, item.price, item.sku)">
                 <use xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="#cart-add"></use>
               </svg>
             </span>
@@ -106,7 +142,7 @@
 import { mapMutations, mapState } from 'vuex'
 import cart from '@/components/common/Cart'
 import shopHeader from '@/components/ShopHeader'
-import { foods } from '@/assets/mockdata'
+import { foods, shop } from '@/assets/mockdata'
 export default {
   created() {
     this.shopId = 1
@@ -118,6 +154,7 @@ export default {
   data() {
     return {
       shopId: null,
+      shopDetails: null,
       loading: true,
       currentIndex: 1,
       //food list
@@ -126,6 +163,10 @@ export default {
       cartList: [],
       showCartList: false,
       totalPrice: 0,
+      //specs
+      showSpecs: false,
+      specsIndex: 0,
+      selectedFood: null,
       //moving dot
       showMovingDot: []
     }
@@ -146,6 +187,13 @@ export default {
       })
       return num
     },
+    //minimum order total
+    minimumTotal: function() {
+      if(this.shopDetails) {
+        return this.shopDetails.minimum_order_amount - this.totalPrice
+      }
+      return null
+    }
   },
   watch: {
     currentCart: function(val) {
@@ -168,6 +216,7 @@ export default {
       this.menu = [
         {name: 'hot', description: 'hot items here', foods: foods}
       ]
+      this.shopDetails = shop
     },
     selectTab(index) {
       this.currentIndex = index
@@ -180,11 +229,11 @@ export default {
       this.toggleCartList()
       this.CLEAR_CART(this.shopId)
     },
-    increaseItem(category_id, item_id, name, specs) {
-      this.ADD_CART({ shop_id: this.shopId, category_id, item_id, name, specs })
+    increaseItem(category_id, item_id, specs_id, name, specs, price, sku) {
+      this.ADD_CART({ shop_id: this.shopId, category_id, item_id, specs_id, name, specs, price, sku })
     },
-    decreaseItem(category_id, item_id, name, specs) {
-      this.REMOVE_CART({ shop_id: this.shopId, category_id, item_id, name, specs })
+    decreaseItem(category_id, item_id, specs_id) {
+      this.REMOVE_CART({ shop_id: this.shopId, category_id, item_id, specs_id })
     },
     refreshCart() {
       let newArray = []
@@ -195,28 +244,46 @@ export default {
         if(this.currentCart && this.currentCart[item.foods[0].category_id]) {
           let num = 0
           Object.keys(this.currentCart[item.foods[0].category_id]).forEach(itemid => {
-            let foodItem = this.currentCart[item.foods[0].category_id][itemid]
-            num += foodItem.number
-            this.totalPrice += foodItem.number * foodItem.price
-            if (foodItem.number > 0) {
-              this.cartList[cartFoodNum] = {}
-              this.cartList[cartFoodNum].category_id = item.foods[0].category_id
-              this.cartList[cartFoodNum].item_id = itemid
-              this.cartList[cartFoodNum].number = foodItem.number
-              this.cartList[cartFoodNum].price = foodItem.price
-              this.cartList[cartFoodNum].name = foodItem.name
-              this.cartList[cartFoodNum].specs = foodItem.specs
-              cartFoodNum++
-            }
+            Object.keys(this.currentCart[item.foods[0].category_id][itemid]).forEach(specsid => {
+              let foodItem = this.currentCart[item.foods[0].category_id][itemid][specsid]
+              num += foodItem.number
+              this.totalPrice += foodItem.number * foodItem.price
+              if (foodItem.number > 0) {
+                this.cartList[cartFoodNum] = {}
+                this.cartList[cartFoodNum].category_id = item.foods[0].category_id
+                this.cartList[cartFoodNum].item_id = itemid
+                this.cartList[cartFoodNum].specs_id = specsid
+                this.cartList[cartFoodNum].number = foodItem.number
+                this.cartList[cartFoodNum].name = foodItem.name
+                this.cartList[cartFoodNum].specs = foodItem.specs
+                this.cartList[cartFoodNum].price = foodItem.price
+                this.cartList[cartFoodNum].sku = foodItem.sku
+                cartFoodNum++
+              }
+            })
           })
           newArray[index] = num
         } else {
           newArray[index] = 0
         }
       })
-      //console.log(newArray, this.totalPrice)
       this.totalPrice = this.totalPrice.toFixed(2)
       //category number
+    },
+    //specs
+    toggleSpecs(food) {
+      if(food) {
+        this.selectedFood = food
+      }
+      this.showSpecs = !this.showSpecs
+      this.specsIndex = 0
+    },
+    selectSpecs(index) {
+      this.specsIndex = index
+    },
+    addSpecs(category_id, item_id, specs_id, name, specs, price, sku) {
+      this.ADD_CART({ shop_id: this.shopId, category_id, item_id, specs_id, name, specs, price, sku })
+      this.toggleSpecs()
     },
     //moving dot
     listenInCart(){
@@ -266,6 +333,7 @@ export default {
 .tabs {
   display: flex;
   border-bottom: 1px solid #eee;
+  margin-top: -0.5rem;
   .tab-item {
     flex: 1;
     text-align: center;
@@ -303,14 +371,14 @@ export default {
   .list-items {
     width: 79.5vw;
     .menu-header {
-      padding: .45rem 2rem;
+      padding: .6rem 2rem;
       border-bottom: 1px solid #eee;
       display: flex;
       align-items: center;
       .header-title {
-        font-size: 1.4rem;
+        font-size: 1.1rem;
         color: #666;
-        font-weight: bold;
+        font-weight: 600;
         margin-right: .6rem;
       }
       .header-desc {
@@ -342,7 +410,7 @@ export default {
             }
           }
           .food-desc {
-            padding: .3rem;
+            padding: 0 .3rem;
             .desc-name {
               font-size: 1.2rem;
               color: #333;
@@ -353,18 +421,42 @@ export default {
             .desc-content {
               font-size: 1rem;
               color: #999;
-              line-height: 1.6rem;
+              line-height: 1.5rem;
               margin: 0rem;
               display: flex;
               align-items: start;
             }
-            .desc-rating {
-              line-height: 1.8rem;
-              font-size: 1.5rem;
+            .desc-sale {
+              line-height: 1.5rem;
+              font-size: 0.8rem;
               color: #333;
               margin: 0rem;
               display: flex;
               align-items: start;
+              .highlight {
+                color: #f60;
+                margin: 0 0.2rem;
+              }
+              .far {
+                margin-left: 0.35rem;
+                margin-top: 0.35rem;
+              }
+            }
+            .desc-rating {
+              line-height: 1.5rem;
+              font-size: 0.8rem;
+              color: #333;
+              margin: 0rem;
+              display: flex;
+              align-items: start;
+              .positive {
+                color: #f60;
+                margin-right: 0.2rem;
+              }
+              .negative {
+                color: #26ad4e;
+                margin-right: 0.2rem;
+              }
             }
             .food-price {
               font-size: 1.2rem;
@@ -413,6 +505,39 @@ export default {
       height: 1.1rem;
       @include sc(.7rem, #fff);
     }
+  }
+  .not-empty {
+    background-color: $blue;
+  }
+  .cart-price {
+    display: flex;
+    font-size: 1.1rem;
+    font-weight: bold;
+    color: #fff;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+  }
+  .check-out {
+    position: absolute;
+    right: 0;
+    bottom: 0;
+    background-color: #606060;
+    @include wh(6.5rem, 100%);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    .checkout-notice {
+      color: #fff;
+      font-size: 0.8rem;
+    }
+    .checkout-button {
+      @include sc(1.1rem, #fff);
+      text-decoration: none;
+    }
+  }
+  .checkout-highlight {
+    background-color: $blue;
   }
 }
 .cart-detail {
@@ -483,5 +608,80 @@ export default {
       }
     }
   }
+}
+.specs-popup {
+  position: fixed;
+  top: 35%;
+  left: 15%;
+  width: 70%;
+  background-color: #fff;
+  z-index: 18;
+  border: 1px;
+  border-radius: 0.2rem;
+  box-shadow: 1px 1px 2px #ccc;
+  .popup-header {
+    .header-title {
+      @include sc(.9rem, #222);
+      font-weight: normal;
+      text-align: center;
+    }
+    .header-cancel {
+      position: absolute;
+      right: .5rem;
+      top: .5rem;
+    }
+  }
+  .popup-content {
+    ul {
+      display: flex;
+      justify-content: center;
+      flex-wrap: wrap;
+      list-style-type: none;
+      padding: 0;
+      li {
+        font-size: .8rem;
+        padding: .3rem .5rem;
+        border: 0.04rem solid #ddd;
+        border-radius: .2rem;
+        margin-right: .5rem;
+        margin-bottom: .2rem;
+      }
+      .isSelected {
+          border-color: $blue;
+          color: $blue;
+      }
+    }
+  }
+  .specs-footer {
+    display: flex;
+	  justify-content: space-between;
+    align-items: center;
+    background-color: #f9f9f9;
+    padding: 0.5rem;
+    border: 1px;
+    border-bottom-left-radius: .2rem;
+    border-bottom-right-radius: .2rem;
+    .footer-price {
+      color: #ff6000;
+      font-size: .9rem;
+      font-family: Helvetica Neue,Tahoma;
+    }
+    .footer-add {
+      @include wh(4rem, 1.5rem);
+      background-color: $blue;
+      border: 1px;
+      border-radius: 0.15rem;
+      @include sc(.7rem, #fff);
+      text-align: center;
+      line-height: 1.5rem;
+    }
+  }
+}
+.show-popup-enter-active, .show-popup-leave-active {
+  transition: all .3s;
+}
+.show-popup-enter, .show-popup-leave-active {
+  opacity: 0;
+  transform: scale(.7);
 }
 </style>
