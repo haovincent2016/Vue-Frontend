@@ -71,6 +71,7 @@ export default {
       let elBottom = event.target.getBoundingClientRect().bottom
       this.showMovingDot.push(true)
       //console.log(this.showMovingDot)
+      //pass add cart svg left and bottom position to it.
       this.$emit('showMovingDot', this.showMovingDot, elLeft, elBottom)
     },
     chooseSpecs() {

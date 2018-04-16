@@ -31,7 +31,7 @@ const shopSchema = new mongoose.Schema({
 	order_number: { type: Number, default: 0 },
 	status: { type: Number, default: 0 }
 });
-
+module.exports = mongoose.model('Shop', shopSchema)
 
 /* food */
 const foodSchema = new Schema({
@@ -67,10 +67,16 @@ const foodSchema = new Schema({
         sold_out: {type: Boolean, default: false}
     }]
 })
-
-/* food category */
-const categorySchema = new Schema({
+module.exports = mongoose.model('Food', foodSchema)
+/* food menu category */
+const menuSchema = new Schema({
 	id: Number,
-	image: String,
-	name: String
-});
+    name: {type: String, isRequired: true},
+    description: {type: String, isRequired: true},
+    shop_id: {type: Number, isRequired: true},
+    foods: [{
+        type: Schema.Types.ObjectId,
+        ref: 'Food'
+    }]
+})
+module.exports = mongoose.model('menu', menuSchema)

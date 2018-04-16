@@ -1,5 +1,6 @@
 <template>
 <div v-if="!loading" class="main-container">
+  <!-- navigation bar -->
   <!-- shop header -->
   <shop-header />
   <!-- shop tabs -->
@@ -21,6 +22,7 @@
       <ul class="menu-wrapper">
         <li v-for="(item, index) in menu" :key="index" class="menu-item" :class="{isActive: index === menuIndex}" @click="selectMenu(index)">
           <span>{{ item.name }}</span>
+          <span class="menu-number" v-if="menuNumber[index]">{{ menuNumber[index] }}</span>
         </li>
       </ul>
     </section>
@@ -37,7 +39,7 @@
           <!-- foods per menu -->
           <div class="food-list" v-for="(food, foodIndex) in item.foods" :key="foodIndex">
             <div class="food-image">
-              <img :src="food.image" >
+              <img v-lazy="food.image">
             </div>
             <div class="food-desc">
               <div class="desc-name">{{ food.name }}</div>
@@ -46,7 +48,7 @@
               <div class="desc-rating" v-if="food.satisfy_rate && food.satisfy_rate > 50"><span class="positive">{{ food.satisfy_rate }}%</span>satisfied customers</div>
               <div class="desc-rating" v-if="food.satisfy_rate && food.satisfy_rate <= 50"><span class="negative">{{ food.satisfy_rate }}%</span>satisfied customers</div>
               <div class="food-price">${{ food.specs[0].price }}</div>
-              <!-- per food cart operations -->
+              <!-- per food item add/remove operations -->
               <cart 
                 :shopId = 'shopId' 
                 :food = 'food' 
@@ -134,6 +136,7 @@
       </div>
     </transition>
   </div>
+  <!-- animation part -->
   <transition name="show-shadow">
     <div class="cart-shadow" v-show="(showCartList && cartList.length) || showSpecs" @click="toggleCartList">
     </div>
@@ -144,30 +147,32 @@
   </transition>
   <transition
     appear
-    @after-appear="afterEnter"
     @before-appear="beforeEnter"
+    @after-appear="afterEnter"
     v-for="(item,index) in showMovingDot"
     :key="index"
     >
       <span class="moving-dot" v-if="item">
-        <svg class="moving-linear">
+        <svg>
           <use xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="#cart-add"></use>
         </svg>
       </span>
   </transition>
 </div>
 <div v-else>
-  <svg>
+  <svg class="loading-screen">
     <use xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="#shop-loading"></use>
   </svg>
 </div>
 </template>
 <script>
 import { mapMutations, mapState } from 'vuex'
-import Scroll from 'better-scroll'
+import BScroll from 'better-scroll'
+import $ from 'jquery'
 import cart from '@/components/common/Cart'
 import shopHeader from '@/components/ShopHeader'
-import { foods, foods2, shop } from '@/assets/mockdata'
+import { menu } from '@/data/foods'
+import { shop1 } from '@/data/shops'
 export default {
   created() {
     this.shopId = 1
@@ -182,15 +187,12 @@ export default {
       //loading
       loading: true,
       //mock data
-      foods: [],
-      foods2: [],
+      menu: [],
       //shop
       shopId: null,
       shopDetails: null,
       loading: true,
       currentIndex: 1,
-      //food list
-      menu: [],
       //cart
       cartList: [],
       showCartList: false,
@@ -207,6 +209,7 @@ export default {
       windowHeight: null,
       //menu
       shopTop: [],
+      menuNumber: [],
       menuIndex: 0,
       menuIndexChanged: true,
       listScroll: null
@@ -261,17 +264,20 @@ export default {
       this.GET_CART()
     },
     getData() {
-      this.foods = foods
-      this.foods2 = foods2
-      this.shopDetails = shop
-      this.menu = [
-        {name: 'hot', description: 'hot items here', foods: this.foods},
-        {name: 'popular', description: 'hot items here', foods: this.foods2}
-      ]
+      this.shopDetails = shop1
+      this.menu = menu
       this.loading = false
     },
     selectTab(index) {
       this.currentIndex = index
+    },
+    //check if user browse on mobile
+    checkDevice() {
+      if( /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent) ) {
+        return true
+      } else {
+        return false
+      }
     },
     //menu and food list
     getListHeight() {
@@ -279,46 +285,55 @@ export default {
       //<li> elements
       const subContainers = Array.from(container.children[0].children)
       subContainers.forEach((item, index) => {
-        this.shopTop[index] = item.offsetTop
+        this.shopTop[index] = item.offsetTop - 42
       })
-      //this.listenScroll(container)
+      this.listenScroll(container)
     },
-    /*
+    
     listenScroll(element) {
-      this.listScroll = new Scroll(element, {
+      this.listScroll = new BScroll(element, {
         probeType: 3,
-        deceleration: 0.001,
         bounce: false,
-        swipeTime: 1500,
         click: true,
       })
-      const wrapper = new Scroll("#menu-wrapper", {
-        click: true,
-      })
-      let wrapperHeight = this.$refs.menuWrapper.clientHeight
-      this.listScroll.on('scroll', (position) => {
-        if(!this.$refs.menuWrapper) {
-          return
-        }
-        this.shopTop.forEach((item, index) => {
-          if(this.menuIndexChanged && Math.abs(Math.round(position.y)) >= item) {
-            this.menuIndex = index
-            const menuActive = this.$refs.menuWrapper.querySelectorAll('.isActive')
-            const el = menuActive[0]
-            wrapper.scrollToElement(el, 800, 0, -(wrapperHeight / 2 - 50))
+      //console.log(this.isMobile)
+      if(this.checkDevice()) {
+        //for mobile device only, slide screen to scroll
+        this.listScroll.on('scroll', (position) => {
+          if(!this.$refs.menuWrapper) {
+            return
           }
+          this.shopTop.forEach((item, index) => {
+            /* scroll to a position bigger than menu offset */
+            if(this.menuIndexChanged && Math.abs(Math.round(position.y)) >= item) {
+              /* set menu index */
+              this.menuIndex = index
+            }
+          })
         })
-      })
+      } else {
+        //for computer browser
+        window.addEventListener('scroll', (e) => {
+          this.shopTop.forEach((item, index) => {
+            if(window.scrollY >= item) {
+              this.menuIndex = index
+            }
+          })
+        })
+      }
     },
-    */
+    
     selectMenu(index) {
       this.menuIndex = index
       this.menuIndexChanged = false
-      /*
-      this.listScroll.scrollTo(0, -this.shopTop[index], 400)
-      this.listScroll.on('scrollEnd', () => {
+      if(this.checkDevice()) {
+        this.listScroll.scrollTo(0, -this.shopTop[index], 400)
+        this.listScroll.on('scrollEnd', () => {
           this.menuIndexChanged = true;
-      })*/
+        })
+      } else {
+        $("html").animate({ scrollTop: this.shopTop[index] }, 400)
+      }
     },
     //cart
     toggleCartList() {
@@ -340,16 +355,18 @@ export default {
       this.totalPrice = 0
       this.cartList = []
       this.menu.forEach((item, index) => {
-        if(this.currentCart && this.currentCart[item.foods[0].category_id]) {
+        let category = item.foods[0].category_id
+        //first food's category in each menu => all categories
+        if(this.currentCart && this.currentCart[category]) {
           let num = 0
-          Object.keys(this.currentCart[item.foods[0].category_id]).forEach(itemid => {
-            Object.keys(this.currentCart[item.foods[0].category_id][itemid]).forEach(specsid => {
-              let foodItem = this.currentCart[item.foods[0].category_id][itemid][specsid]
+          Object.keys(this.currentCart[category]).forEach(itemid => {
+            Object.keys(this.currentCart[category][itemid]).forEach(specsid => {
+              let foodItem = this.currentCart[category][itemid][specsid]
               num += foodItem.number
               this.totalPrice += foodItem.number * foodItem.price
               if (foodItem.number > 0) {
                 this.cartList[cartFoodNum] = {}
-                this.cartList[cartFoodNum].category_id = item.foods[0].category_id
+                this.cartList[cartFoodNum].category_id = category
                 this.cartList[cartFoodNum].item_id = itemid
                 this.cartList[cartFoodNum].specs_id = specsid
                 this.cartList[cartFoodNum].number = foodItem.number
@@ -368,6 +385,7 @@ export default {
       })
       this.totalPrice = this.totalPrice.toFixed(2)
       //category number
+      this.menuNumber = [...newArray]
     },
     //specs
     toggleSpecs(food) {
@@ -384,9 +402,9 @@ export default {
       this.ADD_CART({ shop_id: this.shopId, category_id, item_id, specs_id, name, specs, price, sku })
       this.toggleSpecs()
     },
-    //moving dot
+    //moving dot (bug: sometimes item first added to cart no animation)
     listenInCart(){
-      if (!this.receiveInCart) {
+      if(!this.receiveInCart) {
         this.receiveInCart = true
         this.$refs.cartContainer.addEventListener('animationend', () => {
             this.receiveInCart = false
@@ -397,11 +415,11 @@ export default {
       }
     },
     movingDotFunc(showMovingDot, elLeft, elBottom){
-      //console.log(this.showMovingDot)
       this.showMovingDot = [...showMovingDot]
       this.elLeft = elLeft
       this.elBottom = elBottom
     },
+    //dot transition event listeners
     beforeEnter(el){
       el.style.transform = `translate3d(0,${37 + this.elBottom - this.windowHeight}px,0)`
       el.children[0].style.transform = `translate3d(${this.elLeft - 30}px,0,0)`
@@ -458,7 +476,12 @@ export default {
   75%  { transform: scale(.9) }
   100% { transform: scale(1) }
 }
-
+.main-container {
+  position: absolute;
+  right: 0;
+  left: 0;
+  margin-top: -0.5rem;
+}
 .tabs {
   display: flex;
   border-bottom: 1px solid #eee;
@@ -494,14 +517,27 @@ export default {
       list-style: none;
       margin: 0;
       padding: 0;
+      height: 100vh;
       .menu-item {
         padding: 1.1rem .3rem;
         border-bottom: 0.025rem solid #ededed;
         box-sizing: border-box;
         position: relative;
+        .menu-number {
+          position: absolute;
+          top: .1rem;
+          right: .05rem;
+          background-color: $orange;
+          text-align: center;
+          border-radius: 50%;
+          border: 0.05rem solid $orange;
+          min-width: 0.8rem;
+          @include sc(.7rem, #fff);
+          font-family: Tahoma, Arial;
+        }
       }
       .isActive {
-        border-left: 0.15rem solid #3190e8;
+        border-left: 0.2rem solid #3190e8;
         background-color:#fff;
       }
     }
@@ -509,10 +545,11 @@ export default {
   .list-items {
     margin-left: 20%;
     width: 80%;
+    height: 100vh;
     ul {
       list-style: none;
       margin: 0;
-      padding: 0;
+      padding: 0 0 8rem 0;
       li {
         .menu-header {
           box-shadow: 1px 1px 2px #ccc;
@@ -658,7 +695,7 @@ export default {
       position: absolute;
       top: -.3rem;
       right: -.5rem;
-      background-color: #ff461d;
+      background-color: $orange;
       line-height: 1.1rem;
       text-align: center;
       border-radius: 50%;
@@ -745,7 +782,7 @@ export default {
       padding: .5rem 1.2rem;
       .list-item-title {
         display: flex;
-        flex-wrap: wrap;
+        flex-direction: column;
         color: #666;
         font-weight: 600;
         width: 25vw;
@@ -872,6 +909,13 @@ export default {
     @include wh(.9rem, .9rem);
     fill: #3190e8;
   }
+}
+.loading-screen {
+  position: absolute;
+  height: 100%;
+  width: 100%;
+  top: -2rem;
+  left: 0;
 }
 .show-popup-enter-active, .show-popup-leave-active {
   transition: all .3s;

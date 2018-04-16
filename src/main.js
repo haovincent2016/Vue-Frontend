@@ -6,20 +6,28 @@ import router from './router'
 import store from './store'
 import axios from 'axios'
 import Vuelidate from 'vuelidate'
-import MintUI from 'mint-ui'
+import { Swipe, SwipeItem, Tabbar, TabItem } from 'mint-ui'
 import VueLazyload from 'vue-lazyload'
 import FastClick from 'fastclick'
 import 'mint-ui/lib/style.css'
 
 if ('addEventListener' in document) {
   document.addEventListener('DOMContentLoaded', function() {
-      FastClick.attach(document.body)
+    FastClick.attach(document.body)
   }, false)
 }
 
 Vue.use(Vuelidate)
-Vue.use(VueLazyload)
-Vue.use(MintUI)
+Vue.use(VueLazyload, {
+  preload: 1.3,
+  error: '/static/error.png',
+  loading: '/static/loading.gif',
+  attempt: 2
+})
+Vue.use(Swipe)
+Vue.use(SwipeItem)
+Vue.use(Tabbar)
+Vue.use(TabItem)
 
 Vue.prototype.$http = axios
 Vue.config.productionTip = false
