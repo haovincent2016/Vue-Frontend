@@ -11,11 +11,11 @@
       <router-link to="/shop/1" class="shop-link">
         <!-- shop avatar -->                                    
         <div class="shop-avatar">
-          <img src="http://p0.meituan.net/0.84.63/xianfu/7da5e7e935053ddb8cbb8d662e80e4f337555.jpg.webp" class="j-poi-pic avatar-img">
+          <img src="/static/shops/shop1.jpeg">
         </div>                                    
         <!-- shop content -->
         <div class="shop-content">                                           
-          <div class="shop-title">李先生加州牛肉面（北京清华照澜院店）</div>
+          <div class="shop-title">VCake Store</div>
           <!-- rating -->
           <!--
           <div class="appr-status">
@@ -26,9 +26,9 @@
             <i class="appr-score"></i>
           </div>
           -->
-          <div class="shop-sale">月售999+<span class="shop-location">1.9km | 30min</span></div> 
+          <div class="shop-sale">Monthly sale 999+<span class="shop-location">1.9km | 30min</span></div> 
           <!-- fee detail -->                                                                   
-          <div class="shop-minimum">起送价 ￥20 | 配送 ¥5<span class="shop-delivery">美团专送</span></div> 
+          <div class="shop-minimum">Minimum order $20 | fee $5<span class="shop-delivery">v delivery</span></div> 
         </div>
       </router-link>                                 
     </li>

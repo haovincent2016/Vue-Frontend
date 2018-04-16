@@ -518,7 +518,7 @@ export default {
           box-shadow: 1px 1px 2px #ccc;
           border-radius: 1rem;
           margin: 0.5rem 0.6rem;
-          padding: .6rem 2rem;
+          padding: .6rem 0.8rem;
           border-bottom: 1px solid #eee;
           .header-title {
             font-size: 1rem;

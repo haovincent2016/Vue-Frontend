@@ -5,12 +5,8 @@
 ## Features
 - [x] homepage
 - [x] shop page 
+- [x] shop page animation
 - [x] shopping cart
-
-## Todos
-- [x] dot animation when adding to cart
-- [] scroll animation shop page
-- [] shop page header
 
 ## Build Setup
 
