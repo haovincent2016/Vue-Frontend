@@ -78,6 +78,86 @@ export const foods = [{
     }]
 }]
 
+export const foods2 = [{
+    //shop id
+    shop_id: 1,
+    //food category id
+    category_id: 2,
+    item_id: 3,
+    //infos
+	name: 'chocolate brownie cake',
+    description: 'very popular',
+    image: '/static/foods/shop1/cake3.jpg',
+    //ratings
+    month_sales: 101,
+    rating: 0,
+	rating_count: 0,
+    satisfy_count: 1,
+    satisfy_rate: 80,
+    //specs
+	specs: [{
+        //required
+		sku: 104,
+		name: 'mango flavor',
+        specs_id: 1,
+        //price and fee
+        original_price: 20,
+        price: 20,
+		packing_fee: 2,
+        
+        rating: 0,
+        stock: 20,
+		promotion_stock: 5,
+        sold_out: false
+    }]
+}, {
+    //shop id
+    shop_id: 1,
+    //food category id
+    category_id: 2,
+    item_id: 4,
+    //infos
+	name: 'chocolate brownie cake 2',
+    description: 'very delicious too',
+    image: '/static/foods/shop1/cake4.jpg',
+    //ratings
+    month_sales: 131,
+    rating: 0,
+	rating_count: 0,
+    satisfy_count: 0,
+    satisfy_rate: 98,
+    //specs
+	specs: [{
+        //required
+		sku: 105,
+		name: 'chocolate flavor',
+        specs_id: 1,
+        //price and fee
+        original_price: 129,
+        price: 129,
+		packing_fee: 1,
+        
+        rating: 0,
+        stock: 30,
+		promotion_stock: 2,
+        sold_out: false
+    }, {
+        //required
+		sku: 106,
+		name: 'strawberry flavor',
+        specs_id: 2,
+        //price and fee
+        original_price: 329,
+        price: 329,
+		packing_fee: 1,
+        
+        rating: 0,
+        stock: 40,
+		promotion_stock: 5,
+        sold_out: false
+    }]
+}]
+
 export const shop = {
     //shop id
     id: 1,

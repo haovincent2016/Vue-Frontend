@@ -1,5 +1,5 @@
 <template>
-<div>
+<div class="main-container">
   <nav-header>
     <router-link to="/search" class="search-field">
       <svg width="24" height="24" xmlns="http://www.w3.org/2000/svg" version="1.1">
@@ -11,34 +11,43 @@
   </nav-header>
   <banner />
   <category />
+  <shops />
   <nav-footer />
 </div>
 </template>
 <script>
 import navHeader from '@/components/common/NavHeader'
 import navFooter from '@/components/common/NavFooter'
+import shops from '@/components/common/Shops'
 import Banner from '@/components/Banner'
 import Category from '@/components/Category'
 export default {
   components: {
     navHeader,
     navFooter,
+    shops,
     Banner,
     Category
   }
 }
 </script>
-<style lang="scss" scoped>
+<style lang="scss">
 @import '../assets/common';
+.main-container {
+  position: absolute;
+  right: 0;
+  left: 0;
+  margin-top: -0.5rem;
+}
 .search-field {
   display: flex;
   height: 2rem;
   justify-content: center;
   align-items: center;
-  border-radius: 3px;
+  border-radius: .6rem;
   background: #fff;
   color: $grey;
-  font-size: 1.1rem;
+  font-size: 1rem;
   margin: 0.6rem 1rem;
   text-decoration: none;
 }

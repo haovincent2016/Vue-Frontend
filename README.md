@@ -1,6 +1,16 @@
-# vue-boilerplate
+# vue-frontend
 
-> starter project for vue
+> Build [eleme](https://h5.ele.me/) h5 mobile website frontend using Vue
+
+## Features
+- [x] homepage
+- [x] shop page 
+- [x] shopping cart
+
+## Todos
+- [x] dot animation when adding to cart
+- [] scroll animation shop page
+- [] shop page header
 
 ## Build Setup
 
@@ -17,5 +27,3 @@ npm run build
 # build for production and view the bundle analyzer report
 npm run build --report
 ```
-
-For a detailed explanation on how things work, check out the [guide](http://vuejs-templates.github.io/webpack/) and [docs for vue-loader](http://vuejs.github.io/vue-loader).

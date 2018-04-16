@@ -9,8 +9,10 @@ export default {
     }
   },
   //add item to shopping cart by 1
-  //all cart items --(shop_id)--> all shop's items --(category_id)--> shop's items of category --(item_id)--> specific item --(specs_id)--> item specs
-  //name -> item name, specs -> specs name, price -> specs price ->, sku -> specs sku
+  //1. all cart items --(shop_id)--> all shop's items --(category_id)--> shop's items of category --(item_id)--> specific item --(specs_id)--> item specs
+  //2. name -> item name, specs -> specs name, price -> specs price ->, sku -> specs sku
+  //3. let a = b[c] = (b[c] || {}), if b[c] exists, no change to property c of b. if not exist, assign {} to property c of b.
+  //   so if item[shop_id] not exist, assign value {} to key shop_id, if exist, do nothing.
   [ADD_CART](state, { shop_id, category_id, item_id, specs_id, name, specs, price, sku }) {
     let items = state.cartItems
     let shop = items[shop_id] = (items[shop_id] || {})

@@ -1,29 +1,29 @@
 <template>
 <!-- if no specs to choose, only default one -->
-<section class="cart-wrapper" v-if="food.specs.length === 1">
+<div class="cart-wrapper" v-if="food.specs.length === 1">
   <transition name="show-decrease">
-      <span v-if="foodNumber" @click="decreaseItem(food.category_id, food.item_id, food.specs[0].specs_id)">
-          <svg class="decrease-icon">
-              <use xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="#cart-minus"></use>
-          </svg>
-      </span>
+    <span v-if="foodNumber" class="decrease-icon" @click="decreaseItem(food.category_id, food.item_id, food.specs[0].specs_id)">
+      <svg>
+        <use xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="#cart-minus"></use>
+      </svg>
+    </span>
   </transition>
   <transition name="show-number">
       <span class="food-number" v-if="foodNumber">{{ foodNumber }}</span>
   </transition>
-  <span>
-    <svg class="increase-icon" @touchstart="increaseItem(food.category_id, food.item_id, food.specs[0].specs_id, food.name, food.specs[0].name, food.specs[0].price, food.specs[0].sku, $event)">
-        <use xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="#cart-add"></use>
+  <span class="increase-icon">
+    <svg @click="increaseItem(food.category_id, food.item_id, food.specs[0].specs_id, food.name, food.specs[0].name, food.specs[0].price, food.specs[0].sku, $event)">
+      <use xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="#cart-add"></use>
     </svg>
   </span>
-</section>
+</div>
 <!-- choose specifications -->
-<section class="specs-wrapper" v-else>
+<div class="specs-wrapper" v-else>
   <transition name="show-number">
     <span class="food-number" v-if="foodNumber">{{ foodNumber }}</span>
   </transition>
   <span class="choose-specs" @click="chooseSpecs()">Specs</span>
-</section>
+</div>
 </template>
 
 <script>
@@ -70,6 +70,7 @@ export default {
       let elLeft = event.target.getBoundingClientRect().left
       let elBottom = event.target.getBoundingClientRect().bottom
       this.showMovingDot.push(true)
+      //console.log(this.showMovingDot)
       this.$emit('showMovingDot', this.showMovingDot, elLeft, elBottom)
     },
     chooseSpecs() {
@@ -83,16 +84,19 @@ export default {
 @import '../../assets/common';
 .cart-wrapper{
   position: absolute;
-  right: 2rem;
-  bottom: 0.6rem;
-  display: flex;
+  right: 0;
+  bottom: -0.3rem;
+  .food-number{
+    @include sc(.9rem, #666);
+    text-align: center;
+    font-family: Tahoma;
+    vertical-align: top;
+  }
 }
 .specs-wrapper {
   position: absolute;
-  right: 2rem;
-  bottom: 0.8rem;
-  display: flex;
-  align-items: center;
+  right: 0;
+  bottom: 0.15rem;
   .choose-specs {
     @include sc(.8rem, #fff);
     padding: .1rem .2rem;
@@ -102,26 +106,20 @@ export default {
     margin-top: -.1rem;
     margin-left: .2rem;
   }
+  .food-number{
+    @include sc(.9rem, #666);
+    text-align: center;
+    font-family: Tahoma;
+    vertical-align: middle;
+  }
 }
 
-.food-number{
-  @include sc(.9rem, #666);
-  min-width: 1rem;
-  text-align: center;
-  font-family: Tahoma;
-}
 svg{
   @include wh(1.3rem, 1.3rem);
   fill: #3190e8;
 }
 .increase-icon{
-  position: relative;
-  z-index: 300;
-  margin-left: .25rem;
-}
-.decrease-icon{
-  position: relative;
-  z-index: 300;
+  margin-left: .2rem;
 }
 .show-decrease-enter-active, .show-decrease-leave-active {
   transition: all .3s ease-out;

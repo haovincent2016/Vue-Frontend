@@ -1,5 +1,5 @@
 <template>
-<div>
+<div v-if="!loading" class="main-container">
   <!-- shop header -->
   <shop-header />
   <!-- shop tabs -->
@@ -17,41 +17,40 @@
   <!-- tab details 1: item list-->
   <div class="list" v-show="currentIndex === 1">
     <!-- menu section -->
-    <section class="list-menu">
+    <section class="list-menu" id="menu-wrapper" ref="menuWrapper">
       <ul class="menu-wrapper">
-        <li v-for="(item, index) in menu" :key="index" class="menu-item">
+        <li v-for="(item, index) in menu" :key="index" class="menu-item" :class="{isActive: index === menuIndex}" @click="selectMenu(index)">
           <span>{{ item.name }}</span>
         </li>
       </ul>
     </section>
     <!-- item list -->
-    <section class="list-items">
-      <div class="menu-header" v-if="currentIndex === 1">
-        <strong class="header-title">Hot</strong>
-        <span class="header-desc">hot cakes are here</span>
-      </div>
+    <section class="list-items" ref="menuList">
       <ul>
         <!-- all menu items -->
         <li v-for="(item, index) in menu" :key="index">
+          <!-- menu part -->
+          <div class="menu-header">
+            <div class="header-title">{{ item.name }}</div>
+            <div class="header-desc">{{ item.description }}</div>
+          </div>
           <!-- foods per menu -->
           <div class="food-list" v-for="(food, foodIndex) in item.foods" :key="foodIndex">
             <div class="food-image">
               <img :src="food.image" >
             </div>
             <div class="food-desc">
-              <p class="desc-name">{{ food.name }}</p>
-              <p class="desc-content">{{ food.description }}</p>
-              <p class="desc-sale" v-if="food.month_sales">sold<span class="highlight">{{ food.month_sales }}</span>items<i v-if="food.month_sales > 100" class="far fa-thumbs-up"></i></p>
-              <p class="desc-rating" v-if="food.satisfy_rate && food.satisfy_rate > 50"><span class="positive">{{ food.satisfy_rate }}%</span>satisfied customers</p>
-              <p class="desc-rating" v-if="food.satisfy_rate && food.satisfy_rate <= 50"><span class="negative">{{ food.satisfy_rate }}%</span>satisfied customers</p>
-              <strong class="food-price">
-              <span>${{ food.specs[0].price }}</span>
-              </strong>
+              <div class="desc-name">{{ food.name }}</div>
+              <div class="desc-content">{{ food.description }}</div>
+              <div class="desc-sale" v-if="food.month_sales">sold<span class="highlight">{{ food.month_sales }}</span>items<i v-if="food.month_sales > 100" class="far fa-thumbs-up"></i></div>
+              <div class="desc-rating" v-if="food.satisfy_rate && food.satisfy_rate > 50"><span class="positive">{{ food.satisfy_rate }}%</span>satisfied customers</div>
+              <div class="desc-rating" v-if="food.satisfy_rate && food.satisfy_rate <= 50"><span class="negative">{{ food.satisfy_rate }}%</span>satisfied customers</div>
+              <div class="food-price">${{ food.specs[0].price }}</div>
               <!-- per food cart operations -->
               <cart 
                 :shopId = 'shopId' 
                 :food = 'food' 
-                @showMovingDot = "showMovingDotFunc"
+                @showMovingDot = "movingDotFunc"
                 @showSpecsPopup = "toggleSpecs"
               />
             </div>
@@ -92,8 +91,8 @@
   </transition>
   <!-- shopping cart, reset for different shops -->
   <div class="shop-cart" @click="toggleCartList">
-    <div class="cart-icon-wrapper" :class="{'not-empty': totalNumber > 0}">
-      <span class="cart-items">{{ totalNumber }}</span>
+    <div class="cart-icon-wrapper" :class="{'not-empty': totalNumber > 0, incart: receiveInCart}" ref="cartContainer">
+      <span v-if="totalNumber" class="cart-items">{{ totalNumber }}</span>
       <svg class="cart-icon">
         <use xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="#cart-icon"></use>
       </svg>
@@ -116,7 +115,10 @@
       <div class="detail-list">
         <ul>
           <li v-for="(item, index) in cartList" :key="index" class="list-item">
-            <span class="list-item-name">{{ item.name }}</span>
+            <div class="list-item-title">
+              <span class="list-item-name">{{ item.name }}</span>
+              <span class="list-item-specs">{{ item.specs }}</span>
+            </div>
             <span class="list-item-price">${{ item.price * item.number }}</span>
             <span class="list-item-buttons">
               <svg @click="decreaseItem(item.category_id, item.item_id, item.specs_id)">
@@ -131,28 +133,58 @@
         </ul>
       </div>
     </transition>
-    <transition name="show-shadow">
-      <div class="shadow" v-show="showCartList && cartList.length" @click="toggleCartList">
-      </div>
-    </transition>
   </div>
+  <transition name="show-shadow">
+    <div class="cart-shadow" v-show="(showCartList && cartList.length) || showSpecs" @click="toggleCartList">
+    </div>
+  </transition>
+  <transition name="show-shadow">
+    <div class="specs-shadow" v-show="showSpecs" @click="toggleSpecs">
+    </div>
+  </transition>
+  <transition
+    appear
+    @after-appear="afterEnter"
+    @before-appear="beforeEnter"
+    v-for="(item,index) in showMovingDot"
+    :key="index"
+    >
+      <span class="moving-dot" v-if="item">
+        <svg class="moving-linear">
+          <use xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="#cart-add"></use>
+        </svg>
+      </span>
+  </transition>
+</div>
+<div v-else>
+  <svg>
+    <use xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="#shop-loading"></use>
+  </svg>
 </div>
 </template>
 <script>
 import { mapMutations, mapState } from 'vuex'
+import Scroll from 'better-scroll'
 import cart from '@/components/common/Cart'
 import shopHeader from '@/components/ShopHeader'
-import { foods, shop } from '@/assets/mockdata'
+import { foods, foods2, shop } from '@/assets/mockdata'
 export default {
   created() {
     this.shopId = 1
     this.getCart()
   },
   mounted() {
+    this.windowHeight = window.innerHeight
     this.getData()
   },
   data() {
     return {
+      //loading
+      loading: true,
+      //mock data
+      foods: [],
+      foods2: [],
+      //shop
       shopId: null,
       shopDetails: null,
       loading: true,
@@ -168,7 +200,16 @@ export default {
       specsIndex: 0,
       selectedFood: null,
       //moving dot
-      showMovingDot: []
+      receiveInCart: false,
+      showMovingDot: [],
+      elLeft: 0,
+      elBottom: 0,
+      windowHeight: null,
+      //menu
+      shopTop: [],
+      menuIndex: 0,
+      menuIndexChanged: true,
+      listScroll: null
     }
   },
   computed: {
@@ -196,6 +237,13 @@ export default {
     }
   },
   watch: {
+    loading: function(val) {
+      if(!val) {
+        this.$nextTick(() => {
+          this.getListHeight()
+        })
+      }
+    },
     currentCart: function(val) {
       this.refreshCart()
     },
@@ -213,13 +261,64 @@ export default {
       this.GET_CART()
     },
     getData() {
-      this.menu = [
-        {name: 'hot', description: 'hot items here', foods: foods}
-      ]
+      this.foods = foods
+      this.foods2 = foods2
       this.shopDetails = shop
+      this.menu = [
+        {name: 'hot', description: 'hot items here', foods: this.foods},
+        {name: 'popular', description: 'hot items here', foods: this.foods2}
+      ]
+      this.loading = false
     },
     selectTab(index) {
       this.currentIndex = index
+    },
+    //menu and food list
+    getListHeight() {
+      const container = this.$refs.menuList
+      //<li> elements
+      const subContainers = Array.from(container.children[0].children)
+      subContainers.forEach((item, index) => {
+        this.shopTop[index] = item.offsetTop
+      })
+      //this.listenScroll(container)
+    },
+    /*
+    listenScroll(element) {
+      this.listScroll = new Scroll(element, {
+        probeType: 3,
+        deceleration: 0.001,
+        bounce: false,
+        swipeTime: 1500,
+        click: true,
+      })
+      const wrapper = new Scroll("#menu-wrapper", {
+        click: true,
+      })
+      let wrapperHeight = this.$refs.menuWrapper.clientHeight
+      this.listScroll.on('scroll', (position) => {
+        if(!this.$refs.menuWrapper) {
+          return
+        }
+        this.shopTop.forEach((item, index) => {
+          if(this.menuIndexChanged && Math.abs(Math.round(position.y)) >= item) {
+            this.menuIndex = index
+            const menuActive = this.$refs.menuWrapper.querySelectorAll('.isActive')
+            const el = menuActive[0]
+            wrapper.scrollToElement(el, 800, 0, -(wrapperHeight / 2 - 50))
+          }
+        })
+      })
+    },
+    */
+    selectMenu(index) {
+      this.menuIndex = index
+      this.menuIndexChanged = false
+      /*
+      this.listScroll.scrollTo(0, -this.shopTop[index], 400)
+      this.listScroll.on('scrollEnd', () => {
+          this.menuIndexChanged = true;
+      })*/
     },
     //cart
     toggleCartList() {
@@ -297,8 +396,9 @@ export default {
         })
       }
     },
-    showMovingDotFunc(showMovingDot, elLeft, elBottom){
-      this.showMovingDot = [...this.showMovingDot, ...showMovingDot]
+    movingDotFunc(showMovingDot, elLeft, elBottom){
+      //console.log(this.showMovingDot)
+      this.showMovingDot = [...showMovingDot]
       this.elLeft = elLeft
       this.elBottom = elBottom
     },
@@ -312,7 +412,7 @@ export default {
       el.children[0].style.transform = `translate3d(0,0,0)`
       el.style.transition = 'transform .55s cubic-bezier(0.3, -0.25, 0.7, -0.15)'
       el.children[0].style.transition = 'transform .55s linear';
-      this.showMoveDot = this.showMoveDot.map(item => false)
+      this.showMovingDot = this.showMovingDot.map(item => false)
       el.children[0].style.opacity = 1
       el.children[0].addEventListener('transitionend', () => {
           this.listenInCart()
@@ -330,10 +430,43 @@ export default {
 </script>
 <style lang="scss" scoped>
 @import '../assets/common';
+@keyframes mymove {
+  0%   { transform: scale(1) }
+  25%  { transform: scale(.8) }
+  50%  { transform: scale(1.1) }
+  75%  { transform: scale(.9) }
+  100% { transform: scale(1) }
+}
+@-moz-keyframes mymove {
+  0%   { transform: scale(1) }
+  25%  { transform: scale(.8) }
+  50%  { transform: scale(1.1) }
+  75%  { transform: scale(.9) }
+  100% { transform: scale(1) }
+}
+@-webkit-keyframes mymove {
+  0%   { transform: scale(1) }
+  25%  { transform: scale(.8) }
+  50%  { transform: scale(1.1) }
+  75%  { transform: scale(.9) }
+  100% { transform: scale(1) }
+}
+@-o-keyframes mymove {
+  0%   { transform: scale(1) }
+  25%  { transform: scale(.8) }
+  50%  { transform: scale(1.1) }
+  75%  { transform: scale(.9) }
+  100% { transform: scale(1) }
+}
+
 .tabs {
   display: flex;
   border-bottom: 1px solid #eee;
-  margin-top: -0.5rem;
+  position: fixed;
+  width: 100%;
+  height: 2.1rem;
+  background: #fff;
+  z-index: 20;
   .tab-item {
     flex: 1;
     text-align: center;
@@ -353,102 +486,130 @@ export default {
 .list {
   padding-bottom: 3.3rem;
   display: flex;
+  margin-top: 2.1rem;
   .list-menu {
-    width: 20.5vw;
+    position: fixed;
+    width: 20%;
     .menu-wrapper {
       list-style: none;
       margin: 0;
       padding: 0;
       .menu-item {
-        padding: .7rem .3rem;
+        padding: 1.1rem .3rem;
         border-bottom: 0.025rem solid #ededed;
         box-sizing: border-box;
         position: relative;
-        transform: translateZ(0);
+      }
+      .isActive {
+        border-left: 0.15rem solid #3190e8;
+        background-color:#fff;
       }
     }
   }
   .list-items {
-    width: 79.5vw;
-    .menu-header {
-      padding: .6rem 2rem;
-      border-bottom: 1px solid #eee;
-      display: flex;
-      align-items: center;
-      .header-title {
-        font-size: 1.1rem;
-        color: #666;
-        font-weight: 600;
-        margin-right: .6rem;
-      }
-      .header-desc {
-        font-size: 1.1rem;
-        color: #999;
-        text-overflow: ellipsis;
-      }
-    }
+    margin-left: 20%;
+    width: 80%;
     ul {
       list-style: none;
       margin: 0;
       padding: 0;
       li {
+        .menu-header {
+          box-shadow: 1px 1px 2px #ccc;
+          border-radius: 1rem;
+          margin: 0.5rem 0.6rem;
+          padding: .6rem 2rem;
+          border-bottom: 1px solid #eee;
+          .header-title {
+            font-size: 1rem;
+            color: #666;
+            font-weight: 500;
+            margin-right: .6rem;
+            text-align: left;
+            overflow: hidden;
+            white-space: nowrap;
+            text-overflow: ellipsis;
+          }
+          .header-desc {
+            font-size: 0.8rem;
+            color: $grey;
+            text-align: left;
+            overflow: hidden;
+            white-space: nowrap;
+            text-overflow: ellipsis;
+          }
+        }
         .food-list {
           background-color: #fff;
-          padding: .8rem 2rem;
+          margin: 0.5rem 0.6rem;
+          padding: .8rem;
           border-bottom: 1px solid #f8f8f8;
-          position: relative;
-          overflow: hidden;
-          display: flex;
+          box-shadow: 1px 1px 2px #ccc;
           .food-image {
-            width: 3.2rem;
-            height: 3.2rem;
-            margin-right: .4rem;
+            position: relative;
+            float: left;
+            width: 3.9rem;
+            height: 3.9rem;
+            margin-right: .6rem;
             img {
               width: 100%;
               height: 100%;
               border-radius: 0.3rem;
+              border: 1px solid #eee;
             }
           }
           .food-desc {
-            padding: 0 .3rem;
+            position: relative;
+            margin-left: 4.5rem;
             .desc-name {
-              font-size: 1.2rem;
-              color: #333;
-              margin: 0rem;
-              display: flex;
-              align-items: start;
+              position: relative;
+              margin-right: 0.6rem;
+              font-size: 1.1rem;
+              color: #555;
+              line-height: 1.2rem;
+              text-align: left;
+              display: -webkit-box;
+              overflow: hidden;
+              text-overflow: ellipsis;
+              -webkit-line-clamp: 2;
+              -webkit-box-orient: vertical;
             }
             .desc-content {
-              font-size: 1rem;
+              position: relative;
+              margin-right: 0.6rem;
+              font-size: 0.9rem;
               color: #999;
-              line-height: 1.5rem;
-              margin: 0rem;
-              display: flex;
-              align-items: start;
+              margin-top: .4rem;
+              margin-bottom: .4rem;
+              line-height: 1rem;
+              text-align: left;
+              display: -webkit-box;
+              overflow: hidden;
+              text-overflow: ellipsis;
+              -webkit-line-clamp: 3;
+              -webkit-box-orient: vertical;
             }
             .desc-sale {
-              line-height: 1.5rem;
               font-size: 0.8rem;
-              color: #333;
-              margin: 0rem;
+              color: $grey;
+              margin-top: .4rem;
               display: flex;
-              align-items: start;
+              justify-content: flex-start;
               .highlight {
                 color: #f60;
                 margin: 0 0.2rem;
               }
               .far {
                 margin-left: 0.35rem;
-                margin-top: 0.35rem;
+                margin-top: 0.1rem;
               }
             }
             .desc-rating {
-              line-height: 1.5rem;
               font-size: 0.8rem;
-              color: #333;
-              margin: 0rem;
+              color: $grey;
+              margin-bottom: .4rem;
               display: flex;
-              align-items: start;
+              justify-content: flex-start;
               .positive {
                 color: #f60;
                 margin-right: 0.2rem;
@@ -463,7 +624,7 @@ export default {
               margin-top: .3rem;
               color: #f60;
               display: flex;
-              align-items: start;
+              justify-content: flex-start;
             }
           }
         }
@@ -478,7 +639,7 @@ export default {
   left: 0;
   display: flex;
   align-items: center;
-  z-index: 30;
+  z-index: 40;
   @include wh(100%, 3.3rem);
   background-color: rgba(61,61,63,.9);
   .cart-icon-wrapper {
@@ -508,6 +669,9 @@ export default {
   }
   .not-empty {
     background-color: $blue;
+  }
+  .incart {
+    animation: mymove .5s ease-in-out;
   }
   .cart-price {
     display: flex;
@@ -544,7 +708,7 @@ export default {
   position: fixed;
   width: 100%;
   padding-bottom: 3.3rem;
-  z-index: 20;
+  z-index: 35;
   bottom: 0;
   left: 0;
   background-color: #fff;
@@ -577,14 +741,28 @@ export default {
     .list-item {
       display: flex;
       justify-content: space-between;
+      align-items: center;
       padding: .5rem 1.2rem;
-      .list-item-name {
+      .list-item-title {
         display: flex;
-        font-size: 0.9rem;
+        flex-wrap: wrap;
         color: #666;
         font-weight: 600;
-        width: 45vw;
-        text-overflow: ellipsis;
+        width: 25vw;
+        .list-item-name {
+          font-size: 0.8rem;
+          color: #666;
+          font-weight: 600;
+          overflow: hidden;
+          text-overflow: ellipsis;
+        }
+        .list-item-specs {
+          font-size: 0.6rem;
+          color: #666;
+          font-weight: 500;
+          overflow: hidden;
+          text-overflow: ellipsis;
+        }
       }
       .list-item-price {
         font-size: 0.8rem;
@@ -615,10 +793,10 @@ export default {
   left: 15%;
   width: 70%;
   background-color: #fff;
-  z-index: 18;
+  z-index: 35;
   border: 1px;
   border-radius: 0.2rem;
-  box-shadow: 1px 1px 2px #ccc;
+  //box-shadow: 1px 1px 2px #ccc;
   .popup-header {
     .header-title {
       @include sc(.9rem, #222);
@@ -677,11 +855,46 @@ export default {
     }
   }
 }
+.cart-shadow, .specs-shadow {
+  position: fixed;
+  top: 0;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  background-color: rgba(0,0,0,.3);
+  z-index: 30;
+}
+.moving-dot {
+  position: fixed;
+  bottom: 1.9rem;
+  left: 1.9rem;
+  svg {
+    @include wh(.9rem, .9rem);
+    fill: #3190e8;
+  }
+}
 .show-popup-enter-active, .show-popup-leave-active {
   transition: all .3s;
 }
 .show-popup-enter, .show-popup-leave-active {
   opacity: 0;
   transform: scale(.7);
+}
+
+.show-shadow-enter-active, .show-shadow-leave-active {
+  transition: opacity .5s;
+}
+.show-shadow-enter, .show-shadow-leave-active {
+  opacity: 0;
+}
+
+.fade-choose-enter-active, .fade-choose-leave-active {
+  transition: opacity .5s;
+}
+.fade-choose-leave, .fade-choose-leave-active {
+  display: none;
+}
+.fade-choose-enter, .fade-choose-leave-active {
+  opacity: 0;
 }
 </style>

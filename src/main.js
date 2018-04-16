@@ -8,7 +8,14 @@ import axios from 'axios'
 import Vuelidate from 'vuelidate'
 import MintUI from 'mint-ui'
 import VueLazyload from 'vue-lazyload'
+import FastClick from 'fastclick'
 import 'mint-ui/lib/style.css'
+
+if ('addEventListener' in document) {
+  document.addEventListener('DOMContentLoaded', function() {
+      FastClick.attach(document.body)
+  }, false)
+}
 
 Vue.use(Vuelidate)
 Vue.use(VueLazyload)

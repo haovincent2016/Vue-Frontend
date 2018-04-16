@@ -64,7 +64,7 @@ export default {
     height: 100%;
   }
   .title {
-    font-size: 1rem;
+    font-size: 0.9rem;
     color: $grey;
   }
 }
