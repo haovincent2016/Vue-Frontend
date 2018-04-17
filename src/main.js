@@ -24,10 +24,11 @@ Vue.use(VueLazyload, {
   loading: '/static/loading.gif',
   attempt: 2
 })
-Vue.use(Swipe)
-Vue.use(SwipeItem)
-Vue.use(Tabbar)
-Vue.use(TabItem)
+
+Vue.component(Swipe.name, Swipe)
+Vue.component(SwipeItem.name, SwipeItem)
+Vue.component(Tabbar.name, Tabbar)
+Vue.component(TabItem.name, TabItem)
 
 Vue.prototype.$http = axios
 Vue.config.productionTip = false

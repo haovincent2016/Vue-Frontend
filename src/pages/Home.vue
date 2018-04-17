@@ -38,6 +38,7 @@ export default {
   right: 0;
   left: 0;
   margin-top: -0.5rem;
+  padding-bottom: 5rem;
 }
 .search-field {
   display: flex;

@@ -1,10 +1,11 @@
 <template>
 <div v-if="!loading" class="main-container">
   <!-- navigation bar -->
+  <nav-header go-back="true"></nav-header>
   <!-- shop header -->
   <shop-header />
   <!-- shop tabs -->
-  <div class="tabs">
+  <div class="tabs" :class="{sticky: addSticky === true}">
     <div class="tab-item" @click="selectTab(1)">
       <span class="tab-title" :class="{active: currentIndex === 1}">dishes</span>
     </div>
@@ -18,7 +19,7 @@
   <!-- tab details 1: item list-->
   <div class="list" v-show="currentIndex === 1">
     <!-- menu section -->
-    <section class="list-menu" id="menu-wrapper" ref="menuWrapper">
+    <section class="list-menu" id="menu-wrapper" ref="menuWrapper" :class="{'sticky-menu': addSticky === true}">
       <ul class="menu-wrapper">
         <li v-for="(item, index) in menu" :key="index" class="menu-item" :class="{isActive: index === menuIndex}" @click="selectMenu(index)">
           <span>{{ item.name }}</span>
@@ -27,7 +28,7 @@
       </ul>
     </section>
     <!-- item list -->
-    <section class="list-items" ref="menuList">
+    <section class="list-items" ref="menuList" :class="{'fix-list': addSticky === true}">
       <ul>
         <!-- all menu items -->
         <li v-for="(item, index) in menu" :key="index">
@@ -169,6 +170,7 @@
 import { mapMutations, mapState } from 'vuex'
 import BScroll from 'better-scroll'
 import $ from 'jquery'
+import navHeader from '@/components/common/NavHeader'
 import cart from '@/components/common/Cart'
 import shopHeader from '@/components/ShopHeader'
 import { menu } from '@/data/foods'
@@ -212,7 +214,8 @@ export default {
       menuNumber: [],
       menuIndex: 0,
       menuIndexChanged: true,
-      listScroll: null
+      listScroll: null,
+      addSticky: false
     }
   },
   computed: {
@@ -285,55 +288,37 @@ export default {
       //<li> elements
       const subContainers = Array.from(container.children[0].children)
       subContainers.forEach((item, index) => {
-        this.shopTop[index] = item.offsetTop - 42
+        //first menu add (shop header height - tabs height = 100 - 34 = 66), so bigger
+        if(index === 0) {
+          this.shopTop[index] = item.offsetTop - 193
+        } else {
+          this.shopTop[index] = item.offsetTop - 127
+        }
       })
-      this.listenScroll(container)
+      this.listenScroll()
     },
     
-    listenScroll(element) {
-      this.listScroll = new BScroll(element, {
-        probeType: 3,
-        bounce: false,
-        click: true,
-      })
-      //console.log(this.isMobile)
-      if(this.checkDevice()) {
-        //for mobile device only, slide screen to scroll
-        this.listScroll.on('scroll', (position) => {
-          if(!this.$refs.menuWrapper) {
-            return
+    listenScroll() {
+      window.addEventListener('scroll', (e) => {
+        //scroll more than shop header height
+        if(window.scrollY > 99) {
+          this.addSticky = true
+        } else {
+          this.addSticky = false
+        }
+        this.shopTop.forEach((item, index) => {
+          if(window.scrollY >= item) {
+            this.menuIndex = index
           }
-          this.shopTop.forEach((item, index) => {
-            /* scroll to a position bigger than menu offset */
-            if(this.menuIndexChanged && Math.abs(Math.round(position.y)) >= item) {
-              /* set menu index */
-              this.menuIndex = index
-            }
-          })
         })
-      } else {
-        //for computer browser
-        window.addEventListener('scroll', (e) => {
-          this.shopTop.forEach((item, index) => {
-            if(window.scrollY >= item) {
-              this.menuIndex = index
-            }
-          })
-        })
-      }
+      })
+      
     },
     
     selectMenu(index) {
       this.menuIndex = index
-      this.menuIndexChanged = false
-      if(this.checkDevice()) {
-        this.listScroll.scrollTo(0, -this.shopTop[index], 400)
-        this.listScroll.on('scrollEnd', () => {
-          this.menuIndexChanged = true;
-        })
-      } else {
-        $("html").animate({ scrollTop: this.shopTop[index] }, 400)
-      }
+      $("html").animate({ scrollTop: this.shopTop[index] }, 400)
+      
     },
     //cart
     toggleCartList() {
@@ -441,6 +426,7 @@ export default {
     },
   },
   components: {
+    navHeader,
     cart,
     shopHeader
   }
@@ -485,7 +471,7 @@ export default {
 .tabs {
   display: flex;
   border-bottom: 1px solid #eee;
-  position: fixed;
+  position: relative;
   width: 100%;
   height: 2.1rem;
   background: #fff;
@@ -502,16 +488,18 @@ export default {
     .active {
       color: $blue;
       border-bottom: 2px solid $blue;
-      padding-bottom: 0.4rem;
+      padding-bottom: 0.5rem;
     }
   }
+}
+.sticky {
+  position: fixed;
+  top: 3.2rem;
 }
 .list {
   padding-bottom: 3.3rem;
   display: flex;
-  margin-top: 2.1rem;
   .list-menu {
-    position: fixed;
     width: 20%;
     .menu-wrapper {
       list-style: none;
@@ -525,7 +513,7 @@ export default {
         position: relative;
         .menu-number {
           position: absolute;
-          top: .1rem;
+          top: .15rem;
           right: .05rem;
           background-color: $orange;
           text-align: center;
@@ -542,8 +530,11 @@ export default {
       }
     }
   }
+  .sticky-menu {
+    position: fixed;
+    top: 5.3rem;
+  }
   .list-items {
-    margin-left: 20%;
     width: 80%;
     height: 100vh;
     ul {
@@ -667,6 +658,9 @@ export default {
         }
       }
     }
+  }
+  .fix-list {
+    margin-left: 20%;
   }
 }
 .shop-cart {
