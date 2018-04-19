@@ -8,37 +8,45 @@
   </div>
   <ul class="shop-list">
     <li class="shop">                                
-      <router-link to="/shop/1" class="shop-link">
+      <router-link :to="{ path: `/shop/${shop.id}` }" class="shop-link">
         <!-- shop avatar -->                                    
         <div class="shop-avatar">
           <img src="/static/shops/shop1.jpeg">
         </div>                                    
         <!-- shop content -->
         <div class="shop-content">                                           
-          <div class="shop-title">VCake Store</div>
+          <div class="shop-title">{{ shop.name }}</div>
           <!-- rating -->
-          <!--
-          <div class="appr-status">
-            <i class="appr-score"></i>
-            <i class="appr-score"></i>
-            <i class="appr-score"></i>
-            <i class="appr-score"></i>
-            <i class="appr-score"></i>
-          </div>
-          -->
-          <div class="shop-sale">Monthly sale 999+<span class="shop-location">1.9km | 30min</span></div> 
+          <rating-star :stars="shop.rating"></rating-star>
+          <div class="shop-sale">Monthly sale {{ shop.sale }}<span class="shop-location">1.9km | 30min</span></div> 
           <!-- fee detail -->                                                                   
-          <div class="shop-minimum">Minimum order $20 | fee $5<span class="shop-delivery">v delivery</span></div> 
+          <div class="shop-minimum">Minimum order {{ shop.minimum_order_amount }}<span class="shop-delivery">{{ shop.delivery }}</span></div> 
         </div>
       </router-link>                                 
     </li>
-    <li class="shop">shop 2</li>
   </ul>
 </div>
 </template>
 <script>
+import { shop1 } from '@/data/shops'
+import ratingStar from './Rating'
 export default {
-
+  mounted() {
+    this.getShop()
+  },
+  data() {
+    return {
+      shop: {}
+    }
+  },
+  methods: {
+    getShop() {
+      this.shop = shop1
+    }
+  },
+  components: {
+    ratingStar
+  }
 }
 </script>
 <style lang="scss" scoped>
@@ -72,7 +80,7 @@ export default {
         position: relative;
         float: left;
         width: 4.5rem;
-        height: 3.5rem;
+        height: 3.8rem;
         margin-right: 0.5rem;
         margin-top: 0.2rem;
         img {
@@ -94,7 +102,7 @@ export default {
         .shop-sale {
           display: flex;
           justify-content: space-between;
-          margin: .5rem 0;
+          margin: .7rem 0;
           font-size: 0.7rem;
           color: #666;
            .shop-location {

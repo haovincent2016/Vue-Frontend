@@ -1,7 +1,7 @@
 {
-  "name": "vue-boilerplate",
+  "name": "vue-shop",
   "version": "1.0.0",
-  "description": "starter project for vue",
+  "description": "vue shop",
   "author": "vincent <haovincent@hotmail.com>",
   "private": true,
   "scripts": {

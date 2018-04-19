@@ -5,23 +5,33 @@
   </div>
   <div class="title-wrapper">
     <span class="header-type">Brand</span>
-    <span class="header-name">V's cake</span>
+    <span class="header-name">{{ shop.name }}</span>
     <!-- open modal -->
     <i class="fas fa-expand-arrows-alt"></i>
     <div class="info-wrapper">
-      <span class="header-sale">sale: 999 | </span>
-      <span class="header-delivery">v's delivery |</span>
+      <span class="header-sale">sales: {{shop.sale}} | </span>
+      <span class="header-delivery">{{shop.delivery}} |</span>
       <span class="header-time">about 50 min | </span>
       <span class="header-distance">2.2km</span>
     </div>
-    <div class="header-notice">♥ quality ensured ♥ please contact us at 123-567890 if you found any problems</div>
+    <div class="header-notice">{{ shop.notice }}</div>
   </div>
 </div>
 </template>
 <script>
+import { shop1 } from '@/data/shops'
 export default {
+  mounted() {
+    this.getShop()
+  },
   data() {
     return {
+      shop: {}
+    }
+  },
+  methods: {
+    getShop() {
+      this.shop = shop1
     }
   }
 }
@@ -38,7 +48,7 @@ export default {
   text-align: center;
   margin-top: 3.2rem;
   height: 3.2rem;
-  z-index: 99;
+  z-index: 60;
   .img-wrapper {
     .header-img {
       width: 2.3rem;

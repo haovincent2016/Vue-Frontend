@@ -1,9 +1,11 @@
 <template>
 <div v-if="!loading" class="main-container">
   <!-- navigation bar -->
-  <nav-header go-back="true"></nav-header>
+  <nav-header go-back="true" show-title="V's Cake"></nav-header>
   <!-- shop header -->
-  <shop-header />
+  <div class="header-wrapper" @click="toggleDetail">
+    <shop-header />
+  </div>
   <!-- shop tabs -->
   <div class="tabs" :class="{sticky: addSticky === true}">
     <div class="tab-item" @click="selectTab(1)">
@@ -16,7 +18,7 @@
       <span class="tab-title" :class="{active: currentIndex === 3}">seller</span>
     </div>
   </div>
-  <!-- tab details 1: item list-->
+  <!-- tab details 1: item list -->
   <div class="list" v-show="currentIndex === 1">
     <!-- menu section -->
     <section class="list-menu" id="menu-wrapper" ref="menuWrapper" :class="{'sticky-menu': addSticky === true}">
@@ -62,6 +64,42 @@
       </ul>
     </section>
   </div>
+  <!-- tab detail 2: customer ratings -->
+  <div class="comments" v-show="currentIndex === 2">
+    <div class="rating-section">
+      <div class="total-rating">
+        <span class="total-score">4.5</span>
+        <span class="total-desc">Overall</span>
+      </div>
+      <div class="other-rating">
+        <span class="rating-item">Service:</span>
+        <span class="rating-item">Food:</span>
+        <span class="rating-item">Delivery:</span>
+      </div>
+      <div class="ratings">
+        <span><rating-star stars="4.5"></rating-star></span>
+        <span><rating-star stars="4.6"></rating-star></span>
+        <span><rating-star stars="4.6"></rating-star></span>
+      </div>
+    </div>
+    <div class="comment-section">
+    </div>
+  </div>
+  <!-- shop header detail -->
+  <transition name="show-popup">
+    <div class="header-detail" v-if="showDetail">
+      <div class="detail-title">Opening hours</div>
+      <svg width="16" height="16" xmlns="http://www.w3.org/2000/svg" version="1.1" class="detail-cancel" @click="toggleDetail">
+        <line x1="0" y1="0" x2="16" y2="16"  stroke="#666" stroke-width="1.2"/>
+        <line x1="0" y1="16" x2="16" y2="0"  stroke="#666" stroke-width="1.2"/>
+      </svg>
+      <ul class="detail-content">
+        <li class="detail-item" v-for="item in shopDetails.opening_hours" :key="item.id">
+          {{ item }}
+        </li>
+      </ul> 
+    </div>
+  </transition>
   <!-- food specs selection popup -->
   <transition name="show-popup">
     <div class="specs-popup" v-if="showSpecs">
@@ -139,11 +177,15 @@
   </div>
   <!-- animation part -->
   <transition name="show-shadow">
-    <div class="cart-shadow" v-show="(showCartList && cartList.length) || showSpecs" @click="toggleCartList">
+    <div class="shadow" v-show="(showCartList && cartList.length)" @click="toggleCartList">
     </div>
   </transition>
   <transition name="show-shadow">
-    <div class="specs-shadow" v-show="showSpecs" @click="toggleSpecs">
+    <div class="shadow" v-show="showSpecs" @click="toggleSpecs">
+    </div>
+  </transition>
+  <transition name="show-shadow">
+    <div class="shadow" v-show="showDetail" @click="toggleDetail">
     </div>
   </transition>
   <transition
@@ -172,6 +214,7 @@ import BScroll from 'better-scroll'
 import $ from 'jquery'
 import navHeader from '@/components/common/NavHeader'
 import cart from '@/components/common/Cart'
+import ratingStar from '@/components/common/Rating'
 import shopHeader from '@/components/ShopHeader'
 import { menu } from '@/data/foods'
 import { shop1 } from '@/data/shops'
@@ -195,6 +238,8 @@ export default {
       shopDetails: null,
       loading: true,
       currentIndex: 1,
+      //shop header
+      showDetail: false,
       //cart
       cartList: [],
       showCartList: false,
@@ -273,6 +318,10 @@ export default {
     },
     selectTab(index) {
       this.currentIndex = index
+    },
+    //shop header
+    toggleDetail() {
+      this.showDetail = !this.showDetail
     },
     //check if user browse on mobile
     checkDevice() {
@@ -428,11 +477,22 @@ export default {
   components: {
     navHeader,
     cart,
-    shopHeader
+    shopHeader,
+    ratingStar
   }
 }
 </script>
 <style lang="scss" scoped>
+/*
+z-index
+tabs: 70
+shop-header: 60
+navbar: 70
+shadow: 80
+specs-popup: 90
+cart-detail: 90
+shop-cart: 100
+*/
 @import '../assets/common';
 @keyframes mymove {
   0%   { transform: scale(1) }
@@ -475,7 +535,7 @@ export default {
   width: 100%;
   height: 2.1rem;
   background: #fff;
-  z-index: 20;
+  z-index: 70;
   .tab-item {
     flex: 1;
     text-align: center;
@@ -663,6 +723,42 @@ export default {
     margin-left: 20%;
   }
 }
+.comments {
+  padding: 0.4rem 3rem;
+  border-bottom: 1px solid #eee;
+  .rating-section {
+    display: flex;
+    height: 2.6rem;
+    align-items: center;
+    .total-rating {
+      flex: 2;
+      display: flex;
+      flex-direction: column;
+      font-size: 0.8rem;
+      .total-score {
+        color: $yellow;
+        font-weight: 600;
+        font-size: 1.3rem;
+      }
+    }
+    .other-rating {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      font-size: 0.8rem;
+      .rating-itm {
+      }
+    }
+    .ratings {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      span {
+        padding: .3rem 2rem .3rem 0;
+      }
+    }
+  }
+}
 .shop-cart {
   position: fixed;
   right: 0;
@@ -670,7 +766,7 @@ export default {
   left: 0;
   display: flex;
   align-items: center;
-  z-index: 40;
+  z-index: 100;
   @include wh(100%, 3.3rem);
   background-color: rgba(61,61,63,.9);
   .cart-icon-wrapper {
@@ -739,7 +835,7 @@ export default {
   position: fixed;
   width: 100%;
   padding-bottom: 3.3rem;
-  z-index: 35;
+  z-index: 90;
   bottom: 0;
   left: 0;
   background-color: #fff;
@@ -818,15 +914,55 @@ export default {
     }
   }
 }
+.header-detail {
+  position: fixed;
+  top: 35%;
+  left: 15%;
+  width: 70%;
+  background-color: #fff;
+  z-index: 90;
+  border: 1px;
+  border-radius: 0.3rem;
+  .detail-title {
+    @include sc(1.1rem, #333);
+    font-weight: normal;
+    text-align: center;
+    display: flex;
+    align-items: center;
+    height: 2rem;
+    justify-content: center;
+  }
+  .detail-cancel {
+    position: absolute;
+    right: .5rem;
+    top: .5rem;
+  }
+  .detail-content {
+    text-align: center;
+    list-style: none;
+    padding: 0;
+    margin-bottom: 0;
+    .detail-item:nth-child(odd) {
+      background: #eee;
+      padding: 0.1rem 0;
+      margin: 0.1rem;
+    }
+    .detail-item:nth-child(even) {
+      background: #fff;
+      padding: 0.1rem 0;
+      margin: 0.1rem;
+    }
+  }
+}
 .specs-popup {
   position: fixed;
   top: 35%;
   left: 15%;
   width: 70%;
   background-color: #fff;
-  z-index: 35;
+  z-index: 90;
   border: 1px;
-  border-radius: 0.2rem;
+  border-radius: 0.3rem;
   //box-shadow: 1px 1px 2px #ccc;
   .popup-header {
     .header-title {
@@ -886,14 +1022,14 @@ export default {
     }
   }
 }
-.cart-shadow, .specs-shadow {
+.shadow {
   position: fixed;
   top: 0;
   bottom: 0;
   left: 0;
   right: 0;
   background-color: rgba(0,0,0,.3);
-  z-index: 30;
+  z-index: 80;
 }
 .moving-dot {
   position: fixed;

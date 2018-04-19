@@ -1,12 +1,16 @@
 <template>
 <div class="wrapper">
     <slot class="search"></slot>
-    <section class="back" v-if="goBack">
-      <i class="fas fa-chevron-left" @click="$router.go(-1)"></i>
-    </section>
-    <section class="title" v-if="showTitle">
-      <span class="title-text">{{ showTitle }}</span>
-    </section>
+    <div class="content">
+      <span class="back" v-if="goBack">
+        <i class="fas fa-chevron-left" @click="$router.go(-1)"></i>
+      </span>
+      <span class="title" v-if="showTitle">
+        {{ showTitle }}
+      </span>
+      <span class="right">
+      </span>
+    </div>
 </div>
 </template>
 <script>
@@ -23,19 +27,33 @@ export default {
 .wrapper {
   background-color: $blue;
   position: fixed;
-  z-index: 100;
+  z-index: 70;
   left: 0;
   top: 0;
-  @include wh(100%, 3.2rem); 
-  .back {
+  @include wh(100%, 3.2rem);
+  .content { 
     display: flex;
     align-items: center;
     height: 100%;
-    .fas {
+    .back {
+      flex: 1;
+      .fas {
+        color: #fff;
+        font-size: 1.4rem;
+        padding: 0.4rem;
+        margin-left: 1.2rem;
+      }
+    }
+    .title {
+      flex: 4;
+      font-size: 1.1rem;
       color: #fff;
-      font-size: 1.4rem;
-      padding: 0.4rem;
-      margin-left: 1.2rem;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+    .right {
+      flex: 1;
     }
   }
 }
