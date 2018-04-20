@@ -2,7 +2,7 @@
 <!-- if no specs to choose, only default one -->
 <div class="cart-wrapper" v-if="food.specs.length === 1">
   <transition name="show-decrease">
-    <span v-if="foodNumber" class="decrease-icon" @click="decreaseItem(food.category_id, food.item_id, food.specs[0].specs_id)">
+    <span v-if="foodNumber" class="decrease-icon" @click="decreaseItem(food.category_id, food.item_id, food.specs[0].specs_id, 1)">
       <svg>
         <use xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="#cart-minus"></use>
       </svg>
@@ -12,16 +12,13 @@
       <span class="food-number" v-if="foodNumber">{{ foodNumber }}</span>
   </transition>
   <span class="increase-icon">
-    <svg @click="increaseItem(food.category_id, food.item_id, food.specs[0].specs_id, food.name, food.specs[0].name, food.specs[0].price, food.specs[0].sku, $event)">
+    <svg @click="increaseItem(food.category_id, food.item_id, food.specs[0].specs_id, food.name, food.specs[0].name, food.specs[0].price, food.specs[0].sku, 1, $event)">
       <use xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="#cart-add"></use>
     </svg>
   </span>
 </div>
 <!-- choose specifications -->
 <div class="specs-wrapper" v-else>
-  <transition name="show-number">
-    <span class="food-number" v-if="foodNumber">{{ foodNumber }}</span>
-  </transition>
   <span class="choose-specs" @click="chooseSpecs()">Specs</span>
 </div>
 </template>
@@ -60,16 +57,17 @@ export default {
     ...mapMutations([
       'ADD_CART','REMOVE_CART',
     ]),
-    decreaseItem(category_id, item_id, specs_id){
+    decreaseItem(category_id, item_id, specs_id, number){
       if (this.foodNumber > 0) {
-        this.REMOVE_CART({shop_id: this.shopId, category_id, item_id, specs_id})
+        this.REMOVE_CART({shop_id: this.shopId, category_id, item_id, specs_id, number})
       }
     },
-    increaseItem(category_id, item_id, specs_id, name, specs, price, sku, event){
-      this.ADD_CART({shop_id: this.shopId, category_id, item_id, specs_id, name, specs, price, sku})
+    increaseItem(category_id, item_id, specs_id, name, specs, price, sku, number, event){
+      this.ADD_CART({shop_id: this.shopId, category_id, item_id, specs_id, name, specs, price, sku, number})
       let elLeft = event.target.getBoundingClientRect().left
       let elBottom = event.target.getBoundingClientRect().bottom
       this.showMovingDot.push(true)
+      console.log(this.showMovingDot)
       //console.log(this.showMovingDot)
       //pass add cart svg left and bottom position to it.
       this.$emit('showMovingDot', this.showMovingDot, elLeft, elBottom)

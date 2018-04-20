@@ -25,7 +25,7 @@ export default {
 <style lang="scss" scoped>
 @import '../../assets/common';
 .wrapper {
-  background-color: $blue;
+  background-image: linear-gradient(90deg,#0af,#0085ff);
   position: fixed;
   z-index: 70;
   left: 0;

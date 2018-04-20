@@ -1,8 +1,6 @@
 <template>
   <div id="app">
-    <transition name="router-fade" mode="out-in">
-      <router-view/>
-    </transition>
+    <router-view/>
     <svg-icon></svg-icon>
   </div>
 </template>
@@ -26,11 +24,5 @@ export default {
   color: #2c3e50;
   margin-left: -9px;
   margin-right: -9px;
-}
-.router-fade-enter-active, .router-fade-leave-active {
-	transition: opacity .3s;
-	}
-.router-fade-enter, .router-fade-leave-active {
-  opacity: 0;
 }
 </style>

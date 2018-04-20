@@ -9,6 +9,7 @@ import Vuelidate from 'vuelidate'
 import { Swipe, SwipeItem, Tabbar, TabItem } from 'mint-ui'
 import VueLazyload from 'vue-lazyload'
 import FastClick from 'fastclick'
+import * as VueGoogleMaps from 'vue2-google-maps'
 import 'mint-ui/lib/style.css'
 
 if ('addEventListener' in document) {
@@ -24,6 +25,13 @@ Vue.use(VueLazyload, {
   loading: '/static/loading.gif',
   attempt: 2
 })
+Vue.use(VueGoogleMaps, {
+  load: {
+    key: 'AIzaSyA88ghj7UuFc7SGr64Hotd-zYJQDihvnlE',
+    libraries: 'places'
+  }
+})
+
 
 Vue.component(Swipe.name, Swipe)
 Vue.component(SwipeItem.name, SwipeItem)

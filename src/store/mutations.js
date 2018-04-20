@@ -13,17 +13,17 @@ export default {
   //2. name -> item name, specs -> specs name, price -> specs price ->, sku -> specs sku
   //3. let a = b[c] = (b[c] || {}), if b[c] exists, no change to property c of b. if not exist, assign {} to property c of b.
   //   so if item[shop_id] not exist, assign value {} to key shop_id, if exist, do nothing.
-  [ADD_CART](state, { shop_id, category_id, item_id, specs_id, name, specs, price, sku }) {
+  [ADD_CART](state, { shop_id, category_id, item_id, specs_id, name, specs, price, sku, number }) {
     let items = state.cartItems
     let shop = items[shop_id] = (items[shop_id] || {})
     let category = shop[category_id] = (shop[category_id] || {})
     let food = category[item_id] = (category[item_id] || {})
     if(food[specs_id]) {
-      food[specs_id]['number']++;
+      food[specs_id]['number'] += number;
     } else {
       food[specs_id] = {
         "specs_id" : specs_id,
-        "number" : 1,
+        "number" : number,
         "name" : name,
         "specs" : specs,
         "price" : price,
@@ -34,14 +34,14 @@ export default {
     window.localStorage.setItem('cart', JSON.stringify(state.cartItems))
   },
   //remove item from shopping cart by 1
-  [REMOVE_CART](state, { shop_id, category_id, item_id, specs_id }) {
+  [REMOVE_CART](state, { shop_id, category_id, item_id, specs_id, number }) {
     let items = state.cartItems
     let shop = (items[shop_id] || {})
     let category = (shop[category_id] || {})
     let food = (category[item_id] || {})
     if(food && food[specs_id]) {
       if(food[specs_id]['number'] > 0) {
-        food[specs_id]['number']--;
+        food[specs_id]['number'] -= number;
       } else {
         food[specs_id] = null;
       }

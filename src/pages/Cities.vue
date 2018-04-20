@@ -3,26 +3,26 @@
   <!-- navigation header -->
   <!-- currently picked city -->
   <div class="current">
-    <span></span>
-    <span>if not correct, please pick city bellow</span>
+    <span>Your Location:</span>
+    <span>If not correct, please pick bellow</span>
+  </div>
+  <div class="location">
+    <span>Richmond</span>
+    <span><i class="fas fa-chevron-right"></i></span>
   </div>
   <!-- list of popular cities -->
   <div class="popular">
     <div class="popular-title">Popular Cities</div>
     <ul class="popular-list">
-      <li class="list-item"></li>
+      <li v-for="city in popular" :key="city.id" class="list-item">{{ city }}</li>
     </ul>
   </div>
   <!-- list of all cities based on alphabet -->
   <div class="cities">
-    <div class="cities-title">All Cities</div>
+    <div class="cities-title">All Cities <span>(ordered by alphabet)</span></div>
     <ul class="cities-list">
       <li class="list-item">
-        <div class="alphabet">
-          <span>(ordered by alphabet)</span>
-        </div>
         <ul class="cities-details">
-          <router-link></router-link>
         </ul>
       </li>
     </ul>
@@ -32,7 +32,7 @@
 <script>
 export default {
   mounted() {
-
+    this.getPopular()
   },
   data() {
     return {
@@ -42,7 +42,66 @@ export default {
       all: []
     }
   },
+  methods: {
+    getPopular() {
+      this.popular = [
+        'Richmond', 'Vancouver', 'Coquitlum', 'UBC'
+      ]
+    }
+  }
 }
 </script>
-<style>
+<style lang="scss" scoped>
+@import '../assets/common';
+.current, .location {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  color: #666;
+  font-size: 0.9rem;
+  padding: .5rem .6rem;
+  border-bottom: 0.025rem solid #ededed;
+}
+.popular {
+  margin-top: 0.8rem;
+  .popular-title {
+    text-align: center;
+    font-size: 1.1rem;
+    color: #444;
+    padding: 0.2rem 0;
+    margin: 2.5rem;
+    box-shadow: 1px 1px 2px #ccc;
+    border-radius: 1rem;
+  }
+  .popular-list {
+    display: flex;
+    flex-wrap: nowrap;
+    margin: 0 .4rem;
+    .list-item {
+      flex: 1;
+      border: 0.02rem solid #ededed;
+      color: $blue;
+      padding: .5rem 0;
+    }
+  }
+}
+.cities {
+  .cities-title {
+    text-align: center;
+    font-size: 1.1rem;
+    color: #444;
+    padding: 0.2rem 0;
+    margin: 2.5rem;
+    box-shadow: 1px 1px 2px #ccc;
+    border-radius: 1rem;
+    span {
+      font-size: 0.9rem;
+    }
+  }
+  .cities-list {
+    display: flex;
+    flex-wrap: nowrap;
+    margin: 0.8rem .4rem;
+  }
+}
 </style>

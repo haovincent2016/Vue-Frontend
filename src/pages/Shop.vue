@@ -122,9 +122,27 @@
         </section>
         <footer class="specs-footer">
             <div class="footer-price">
-              <span>${{selectedFood.specs[specsIndex].price}}</span>
+              <span>${{selectedFood.specs[specsIndex].price * specsNumber}}</span>
             </div>
-            <div class="footer-add" @click="addSpecs(selectedFood.category_id, selectedFood.item_id, selectedFood.specs[specsIndex].specs_id, selectedFood.name, selectedFood.specs[specsIndex].name, selectedFood.specs[specsIndex].price, selectedFood.specs[specsIndex].sku)">
+            <!-- add multiple food of certain specs -->
+            <div class="specs-wrapper">
+              <transition name="specs-decrease">
+                <span v-if="specsNumber > 1" class="decrease-icon" @click="decreaseSpecsItem">
+                  <svg>
+                    <use xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="#cart-minus"></use>
+                  </svg>
+                </span>
+              </transition>
+              <transition name="specs-number">
+                  <span class="specs-number" v-if="specsNumber">{{ specsNumber }}</span>
+              </transition>
+              <span class="increase-icon">
+                <svg @click="increaseSpecsItem">
+                  <use xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="#cart-add"></use>
+                </svg>
+              </span>
+            </div>
+            <div class="footer-add" @click="addSpecs(selectedFood.category_id, selectedFood.item_id, selectedFood.specs[specsIndex].specs_id, selectedFood.name, selectedFood.specs[specsIndex].name, selectedFood.specs[specsIndex].price, selectedFood.specs[specsIndex].sku, specsNumber)">
               <span>Add Cart</span>
             </div>
         </footer>
@@ -162,11 +180,11 @@
             </div>
             <span class="list-item-price">${{ item.price * item.number }}</span>
             <span class="list-item-buttons">
-              <svg @click="decreaseItem(item.category_id, item.item_id, item.specs_id)">
+              <svg @click="decreaseItem(item.category_id, item.item_id, item.specs_id, 1)">
                 <use xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="#cart-minus"></use>
               </svg>
               <span class="list-item-number">{{ item.number }}</span>
-              <svg @click="increaseItem(item.category_id, item.item_id, item.specs_id, item.name, item.specs, item.price, item.sku)">
+              <svg @click="increaseItem(item.category_id, item.item_id, item.specs_id, item.name, item.specs, item.price, item.sku, 1)">
                 <use xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="#cart-add"></use>
               </svg>
             </span>
@@ -210,7 +228,6 @@
 </template>
 <script>
 import { mapMutations, mapState } from 'vuex'
-import BScroll from 'better-scroll'
 import $ from 'jquery'
 import navHeader from '@/components/common/NavHeader'
 import cart from '@/components/common/Cart'
@@ -248,6 +265,7 @@ export default {
       showSpecs: false,
       specsIndex: 0,
       selectedFood: null,
+      specsNumber: 1,
       //moving dot
       receiveInCart: false,
       showMovingDot: [],
@@ -302,6 +320,10 @@ export default {
       if(!val.length) {
         this.showCartList = false
       }
+    },
+    //reset specs number when change specs
+    specsIndex: function(val) {
+      this.specsNumber = 1
     }
   },
   methods: {
@@ -323,14 +345,6 @@ export default {
     toggleDetail() {
       this.showDetail = !this.showDetail
     },
-    //check if user browse on mobile
-    checkDevice() {
-      if( /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent) ) {
-        return true
-      } else {
-        return false
-      }
-    },
     //menu and food list
     getListHeight() {
       const container = this.$refs.menuList
@@ -344,10 +358,6 @@ export default {
           this.shopTop[index] = item.offsetTop - 127
         }
       })
-      this.listenScroll()
-    },
-    
-    listenScroll() {
       window.addEventListener('scroll', (e) => {
         //scroll more than shop header height
         if(window.scrollY > 99) {
@@ -361,7 +371,6 @@ export default {
           }
         })
       })
-      
     },
     
     selectMenu(index) {
@@ -377,11 +386,11 @@ export default {
       this.toggleCartList()
       this.CLEAR_CART(this.shopId)
     },
-    increaseItem(category_id, item_id, specs_id, name, specs, price, sku) {
-      this.ADD_CART({ shop_id: this.shopId, category_id, item_id, specs_id, name, specs, price, sku })
+    increaseItem(category_id, item_id, specs_id, name, specs, price, sku, number) {
+      this.ADD_CART({ shop_id: this.shopId, category_id, item_id, specs_id, name, specs, price, sku, number })
     },
-    decreaseItem(category_id, item_id, specs_id) {
-      this.REMOVE_CART({ shop_id: this.shopId, category_id, item_id, specs_id })
+    decreaseItem(category_id, item_id, specs_id, number) {
+      this.REMOVE_CART({ shop_id: this.shopId, category_id, item_id, specs_id, number })
     },
     refreshCart() {
       let newArray = []
@@ -422,29 +431,38 @@ export default {
       this.menuNumber = [...newArray]
     },
     //specs
+    increaseSpecsItem() {
+      this.specsNumber++;
+    },
+    decreaseSpecsItem() {
+      if(this.specsNumber > 1) {
+        this.specsNumber--;
+      }
+    },
     toggleSpecs(food) {
       if(food) {
         this.selectedFood = food
       }
       this.showSpecs = !this.showSpecs
       this.specsIndex = 0
+      this.specsNumber = 1
     },
     selectSpecs(index) {
       this.specsIndex = index
     },
-    addSpecs(category_id, item_id, specs_id, name, specs, price, sku) {
-      this.ADD_CART({ shop_id: this.shopId, category_id, item_id, specs_id, name, specs, price, sku })
+    addSpecs(category_id, item_id, specs_id, name, specs, price, sku, number) {
+      this.ADD_CART({ shop_id: this.shopId, category_id, item_id, specs_id, name, specs, price, sku, number })
       this.toggleSpecs()
     },
-    //moving dot (bug: sometimes item first added to cart no animation)
+    //moving dot (bug 1: when another item first added to cart no animation)
     listenInCart(){
       if(!this.receiveInCart) {
         this.receiveInCart = true
         this.$refs.cartContainer.addEventListener('animationend', () => {
-            this.receiveInCart = false
+          this.receiveInCart = false
         })
         this.$refs.cartContainer.addEventListener('webkitAnimationEnd', () => {
-            this.receiveInCart = false
+          this.receiveInCart = false
         })
       }
     },
@@ -464,7 +482,9 @@ export default {
       el.children[0].style.transform = `translate3d(0,0,0)`
       el.style.transition = 'transform .55s cubic-bezier(0.3, -0.25, 0.7, -0.15)'
       el.children[0].style.transition = 'transform .55s linear';
-      this.showMovingDot = this.showMovingDot.map(item => false)
+      //fix bug 1
+      //reset before getting values from cart component
+      this.showMovingDot = []
       el.children[0].style.opacity = 1
       el.children[0].addEventListener('transitionend', () => {
           this.listenInCart()
@@ -844,7 +864,7 @@ shop-cart: 100
     justify-content: space-between;
     align-items: center;
     padding: .5rem 1.2rem;
-    background-color: #eceff1;
+    background-color: $whitegrey;
     .title {
       font-size: 1rem;
       color: #666;
@@ -880,6 +900,7 @@ shop-cart: 100
           font-size: 0.8rem;
           color: #666;
           font-weight: 600;
+          white-space: nowrap;
           overflow: hidden;
           text-overflow: ellipsis;
         }
@@ -943,7 +964,7 @@ shop-cart: 100
     padding: 0;
     margin-bottom: 0;
     .detail-item:nth-child(odd) {
-      background: #eee;
+      background: $whitegrey;
       padding: 0.1rem 0;
       margin: 0.1rem;
     }
@@ -1001,7 +1022,7 @@ shop-cart: 100
     display: flex;
 	  justify-content: space-between;
     align-items: center;
-    background-color: #f9f9f9;
+    background-color: $whitegrey;
     padding: 0.5rem;
     border: 1px;
     border-bottom-left-radius: .2rem;
@@ -1010,6 +1031,28 @@ shop-cart: 100
       color: #ff6000;
       font-size: .9rem;
       font-family: Helvetica Neue,Tahoma;
+    }
+    .specs-wrapper{
+      margin-top: .4rem;
+      .decrease-icon {
+        svg{
+          @include wh(1.3rem, 1.3rem);
+          fill: #3190e8;
+        }
+      }
+      .specs-number{
+        @include sc(.9rem, #666);
+        text-align: center;
+        font-family: Tahoma;
+        vertical-align: top;
+      }
+      .increase-icon {
+        margin-left: .2rem;
+        svg{
+          @include wh(1.3rem, 1.3rem);
+          fill: #3190e8;
+        }
+      }
     }
     .footer-add {
       @include wh(4rem, 1.5rem);
@@ -1050,7 +1093,7 @@ shop-cart: 100
 .show-popup-enter-active, .show-popup-leave-active {
   transition: all .3s;
 }
-.show-popup-enter, .show-popup-leave-active {
+.show-popup-enter, .show-popup-leave-to {
   opacity: 0;
   transform: scale(.7);
 }
@@ -1058,17 +1101,31 @@ shop-cart: 100
 .show-shadow-enter-active, .show-shadow-leave-active {
   transition: opacity .5s;
 }
-.show-shadow-enter, .show-shadow-leave-active {
+.show-shadow-enter, .show-shadow-leave-to {
   opacity: 0;
 }
 
 .fade-choose-enter-active, .fade-choose-leave-active {
   transition: opacity .5s;
 }
-.fade-choose-leave, .fade-choose-leave-active {
+.fade-choose-leave, .fade-choose-leave-to {
   display: none;
 }
-.fade-choose-enter, .fade-choose-leave-active {
+.fade-choose-enter, .fade-choose-leave-to {
+  opacity: 0;
+}
+
+.specs-decrease-enter-active, .specs-decrease-leave-active {
+  transition: all .3s ease-out;
+}
+.specs-decrease-enter, .specs-decrease-leave-to {
+  opacity: 0;
+  transform: translateX(1rem);
+}
+.specs-number-enter-active, .specs-number-leave-active {
+  transition: all .3s;
+}
+.specs-number-enter, .specs-number-leave-to {
   opacity: 0;
 }
 </style>
