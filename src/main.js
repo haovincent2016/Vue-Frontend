@@ -21,8 +21,8 @@ if ('addEventListener' in document) {
 Vue.use(Vuelidate)
 Vue.use(VueLazyload, {
   preload: 1.3,
-  error: '/static/error.png',
-  loading: '/static/loading.gif',
+  error: '/h5/static/error.png',
+  loading: '/h5/static/loading.gif',
   attempt: 2
 })
 Vue.use(VueGoogleMaps, {

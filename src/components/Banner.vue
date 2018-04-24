@@ -8,12 +8,13 @@
 </div>
 </template>
 <script>
+import { baseUrl } from '@/config'
 export default {
   data() {
     return {
       banners: [
-        {name: 'first banner', source: '/static/banners/1.jpeg'},
-        {name: 'second banner', source: '/static/banners/2.jpeg'}
+        {name: 'first banner', source: baseUrl + 'static/banners/1.jpeg'},
+        {name: 'second banner', source: baseUrl + 'static/banners/2.jpeg'}
       ]
     }
   }

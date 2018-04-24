@@ -591,6 +591,7 @@ shop-cart: 100
         border-bottom: 0.025rem solid #ededed;
         box-sizing: border-box;
         position: relative;
+        cursor: pointer;
         .menu-number {
           position: absolute;
           top: .15rem;
@@ -998,6 +999,7 @@ shop-cart: 100
     }
   }
   .popup-content {
+    margin-bottom: 1rem;
     ul {
       display: flex;
       justify-content: center;
@@ -1011,6 +1013,7 @@ shop-cart: 100
         border-radius: .2rem;
         margin-right: .5rem;
         margin-bottom: .2rem;
+        cursor: pointer;
       }
       .isSelected {
           border-color: $blue;
@@ -1062,6 +1065,7 @@ shop-cart: 100
       @include sc(.7rem, #fff);
       text-align: center;
       line-height: 1.5rem;
+      cursor: pointer;
     }
   }
 }

@@ -11,7 +11,7 @@
       <router-link :to="{ path: `/shop/${shop.id}` }" class="shop-link">
         <!-- shop avatar -->                                    
         <div class="shop-avatar">
-          <img src="/static/shops/shop1.jpeg">
+          <img :src="shop.image">
         </div>                                    
         <!-- shop content -->
         <div class="shop-content">                                           
@@ -28,6 +28,7 @@
 </div>
 </template>
 <script>
+import { baseUrl } from '@/config'
 import { shop1 } from '@/data/shops'
 import ratingStar from './Rating'
 export default {

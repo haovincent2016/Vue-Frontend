@@ -1,3 +1,4 @@
+import { baseUrl } from '@/config'
 const foods1 = [{
     //shop id
     shop_id: 1,
@@ -7,7 +8,7 @@ const foods1 = [{
     //infos
 	name: 'cheese cake',
     description: 'very delicious',
-    image: '/static/foods/shop1/cake.jpeg',
+    image: baseUrl+'static/foods/shop1/cake.jpeg',
     //ratings
     month_sales: 201,
     rating: 0,
@@ -39,7 +40,7 @@ const foods1 = [{
     //infos
 	name: 'cheese cake 2',
     description: 'very delicious too',
-    image: '/static/foods/shop1/cake2.jpeg',
+    image: baseUrl+'static/foods/shop1/cake2.jpeg',
     //ratings
     month_sales: 13,
     rating: 0,
@@ -85,7 +86,7 @@ const foods1 = [{
     //infos
 	name: 'cheese cake 3',
     description: 'very delicious',
-    image: '/static/foods/shop1/cake.jpeg',
+    image: baseUrl+'static/foods/shop1/cake.jpeg',
     //ratings
     month_sales: 201,
     rating: 0,
@@ -117,7 +118,7 @@ const foods1 = [{
     //infos
 	name: 'cheese cake 4',
     description: 'very delicious',
-    image: '/static/foods/shop1/cake.jpeg',
+    image: baseUrl+'static/foods/shop1/cake.jpeg',
     //ratings
     month_sales: 201,
     rating: 0,
@@ -149,7 +150,7 @@ const foods1 = [{
     //infos
 	name: 'cheese cake 5',
     description: 'very delicious',
-    image: '/static/foods/shop1/cake.jpeg',
+    image: baseUrl+'static/foods/shop1/cake.jpeg',
     //ratings
     month_sales: 201,
     rating: 0,
@@ -181,7 +182,7 @@ const foods1 = [{
     //infos
 	name: 'cheese cake 6',
     description: 'very delicious',
-    image: '/static/foods/shop1/cake.jpeg',
+    image: baseUrl+'static/foods/shop1/cake.jpeg',
     //ratings
     month_sales: 201,
     rating: 0,
@@ -213,7 +214,7 @@ const foods1 = [{
     //infos
 	name: 'cheese cake 7',
     description: 'very delicious',
-    image: '/static/foods/shop1/cake.jpeg',
+    image: baseUrl+'static/foods/shop1/cake.jpeg',
     //ratings
     month_sales: 201,
     rating: 0,
@@ -247,7 +248,7 @@ const foods2 = [{
     //infos
 	name: 'chocolate brownie cake',
     description: 'very popular',
-    image: '/static/foods/shop1/cake3.jpg',
+    image: baseUrl+'static/foods/shop1/cake3.jpg',
     //ratings
     month_sales: 101,
     rating: 0,
@@ -279,7 +280,7 @@ const foods2 = [{
     //infos
 	name: 'chocolate brownie cake 2',
     description: 'very delicious too',
-    image: '/static/foods/shop1/cake4.jpg',
+    image: baseUrl+'static/foods/shop1/cake4.jpg',
     //ratings
     month_sales: 131,
     rating: 0,
@@ -325,7 +326,7 @@ const foods2 = [{
     //infos
 	name: 'chocolate brownie cake 3',
     description: 'very popular',
-    image: '/static/foods/shop1/cake3.jpg',
+    image: baseUrl+'static/foods/shop1/cake3.jpg',
     //ratings
     month_sales: 101,
     rating: 0,
@@ -357,7 +358,7 @@ const foods2 = [{
     //infos
 	name: 'chocolate brownie cake 4',
     description: 'very popular',
-    image: '/static/foods/shop1/cake3.jpg',
+    image: baseUrl+'static/foods/shop1/cake3.jpg',
     //ratings
     month_sales: 101,
     rating: 0,
@@ -389,7 +390,7 @@ const foods2 = [{
     //infos
 	name: 'chocolate brownie cake 5',
     description: 'very popular',
-    image: '/static/foods/shop1/cake3.jpg',
+    image: baseUrl+'static/foods/shop1/cake3.jpg',
     //ratings
     month_sales: 101,
     rating: 0,
@@ -421,7 +422,7 @@ const foods2 = [{
     //infos
 	name: 'chocolate brownie cake 6',
     description: 'very popular',
-    image: '/static/foods/shop1/cake3.jpg',
+    image: baseUrl+'static/foods/shop1/cake3.jpg',
     //ratings
     month_sales: 101,
     rating: 0,
@@ -453,7 +454,7 @@ const foods2 = [{
     //infos
 	name: 'chocolate brownie cake 7',
     description: 'very popular',
-    image: '/static/foods/shop1/cake3.jpg',
+    image: baseUrl+'static/foods/shop1/cake3.jpg',
     //ratings
     month_sales: 101,
     rating: 0,

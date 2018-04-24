@@ -6,7 +6,7 @@
 </template>
 <script>
 import navHeader from '@/components/common/NavHeader'
-import navFooter from '../components/common/NavFooter'
+import navFooter from '@/components/common/NavFooter'
 export default {
     components: {
         navHeader,

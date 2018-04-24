@@ -1,7 +1,7 @@
 <template>
 <div class="shop-header">
   <div class="img-wrapper">
-    <img class="header-img" src="/static/shops/brand1.png">
+    <img class="header-img" :src="shop.brand">
   </div>
   <div class="title-wrapper">
     <span class="header-type">Brand</span>
@@ -20,6 +20,7 @@
 </template>
 <script>
 import { shop1 } from '@/data/shops'
+import { baseUrl } from '@/config'
 export default {
   mounted() {
     this.getShop()

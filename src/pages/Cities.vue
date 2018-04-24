@@ -1,12 +1,13 @@
 <template>
 <div class="main-container">
   <!-- navigation header -->
+  <nav-header go-back="true" show-title="my location"></nav-header>
   <!-- currently picked city -->
   <div class="current">
     <span>Your Location:</span>
     <span>If not correct, please pick bellow</span>
   </div>
-  <div class="location">
+  <div class="location" @click="goSearch">
     <span>Richmond</span>
     <span><i class="fas fa-chevron-right"></i></span>
   </div>
@@ -30,6 +31,7 @@
 </div>
 </template>
 <script>
+import navHeader from '@/components/common/NavHeader'
 export default {
   mounted() {
     this.getPopular()
@@ -47,7 +49,13 @@ export default {
       this.popular = [
         'Richmond', 'Vancouver', 'Coquitlum', 'UBC'
       ]
+    },
+    goSearch() {
+      this.$router.push({ name: "Location" })
     }
+  },
+  components: {
+    navHeader
   }
 }
 </script>
@@ -61,6 +69,9 @@ export default {
   font-size: 0.9rem;
   padding: .5rem .6rem;
   border-bottom: 0.025rem solid #ededed;
+}
+.current {
+  margin-top: 3.2rem;
 }
 .popular {
   margin-top: 0.8rem;

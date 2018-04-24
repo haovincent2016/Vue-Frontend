@@ -2,7 +2,7 @@
 <div class="account-wrapper">
   <nav-header go-back="true" show-title="my account"></nav-header>
   <nav-footer />
-  <div class="profile-section">
+  <div class="profile-section" @click="goAuth">
     <span class="profile-avatar">
       <svg>
           <use xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="#avatar-default"></use>
@@ -50,7 +50,7 @@
           <use xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="#address"></use>
         </svg>
       </aside>
-      <div class="location-wrapper">
+      <div class="location-wrapper" @click="goLocation">
         <span class="location-name">My Location</span>
         <span class="location-arrow">
           <svg fill="#666">
@@ -64,8 +64,16 @@
 </template>
 <script>
 import navHeader from '@/components/common/NavHeader'
-import navFooter from '../components/common/NavFooter'
+import navFooter from '@/components/common/NavFooter'
 export default {
+  methods: {
+    goAuth() {
+      this.$router.push({ name: 'Login' })
+    },
+    goLocation() {
+      this.$router.push({ name: 'Cities' })
+    }
+  },
   components: {
     navHeader,
     navFooter
@@ -87,8 +95,8 @@ export default {
   .profile-avatar {
     flex: 1;
     svg {
-      width: 2.5rem;
-      height: 2.5rem;
+      width: 2.7rem;
+      height: 2.7rem;
     }
   }
   .profile-auth {
@@ -114,8 +122,8 @@ export default {
   .profile-arrow {
     flex: 1;
     svg {
-      width: 1rem;
-      height: 1rem;
+      width: 0.7rem;
+      height: 0.7rem;
     }
   }
 }
@@ -128,6 +136,9 @@ export default {
     flex: 1;
     color: #666;
     text-decoration: none;
+    &:not(:last-child) {
+      border-right: 1px solid #ddd;
+    }
     svg {
       width: 2rem;
       height: 2rem;
@@ -142,11 +153,11 @@ export default {
   margin-top: 1rem;
   border-top: 1px solid #eee;
   border-bottom: 1px solid #eee;
-  font-size: 1rem;
+  font-size: .9rem;
   a {
     display: flex;
     align-items: center;
-    padding: .5rem 2rem;
+    padding: .7rem 1.6rem;
     aside {
       margin-right: .4rem;
       svg {
@@ -162,8 +173,8 @@ export default {
       justify-content: space-between;
       .location-arrow {
         svg {
-          height: .9rem;
-          width: .9rem;
+          height: .7rem;
+          width: .7rem;
           vertical-align: middle;
         }
       }

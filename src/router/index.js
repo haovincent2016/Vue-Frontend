@@ -7,6 +7,7 @@ import Cities from '@/pages/Cities'
 import Discover from '@/pages/Discover'
 import Account from '@/pages/Account'
 import Order from '@/pages/Order'
+import Login from '@/pages/Login'
 
 Vue.use(Router)
 
@@ -46,6 +47,11 @@ export default new Router({
       path: '/shop/:id',
       name: 'Shop',
       component: Shop
+    },
+    {
+      path: '/login',
+      name: 'Login',
+      component: Login
     }
   ]
 })

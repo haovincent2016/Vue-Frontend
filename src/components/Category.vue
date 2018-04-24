@@ -21,20 +21,21 @@
 </div>
 </template>
 <script>
+import { baseUrl } from '@/config'
 export default {
   data() {
     return {
       categories: [
-        {name: 'Food', source: '/static/categories/1.jpeg', link: '', page: 'one'},
-        {name: 'Store', source: '/static/categories/2.jpeg', link: '', page: 'one'},
-        {name: 'Vege', source: '/static/categories/3.jpeg', link: '', page: 'one'},
-        {name: 'Coffee', source: '/static/categories/4.jpeg', link: '', page: 'one'},
-        {name: 'Med', source: '/static/categories/5.jpeg', link: '', page: 'one'},
-        {name: '50%Off', source: '/static/categories/6.jpeg', link: '', page: 'one'},
-        {name: 'Flower', source: '/static/categories/7.jpeg', link: '', page: 'one'},
-        {name: 'Hotpot', source: '/static/categories/8.jpeg', link: '', page: 'one'},
-        {name: 'Special', source: '/static/categories/9.jpeg', link: '', page: 'two'},
-        {name: 'Pizza', source: '/static/categories/10.jpeg', link: '', page: 'two'}
+        {name: 'Food', source: baseUrl+'static/categories/1.jpeg', link: '', page: 'one'},
+        {name: 'Store', source: baseUrl+'static/categories/2.jpeg', link: '', page: 'one'},
+        {name: 'Vege', source: baseUrl+'static/categories/3.jpeg', link: '', page: 'one'},
+        {name: 'Coffee', source: baseUrl+'static/categories/4.jpeg', link: '', page: 'one'},
+        {name: 'Med', source: baseUrl+'static/categories/5.jpeg', link: '', page: 'one'},
+        {name: '50%Off', source: baseUrl+'static/categories/6.jpeg', link: '', page: 'one'},
+        {name: 'Flower', source: baseUrl+'static/categories/7.jpeg', link: '', page: 'one'},
+        {name: 'Hotpot', source: baseUrl+'static/categories/8.jpeg', link: '', page: 'one'},
+        {name: 'Special', source: baseUrl+'static/categories/9.jpeg', link: '', page: 'two'},
+        {name: 'Pizza', source: baseUrl+'static/categories/10.jpeg', link: '', page: 'two'}
       ]
     }
   },

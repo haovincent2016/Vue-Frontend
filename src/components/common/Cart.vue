@@ -104,6 +104,7 @@ export default {
     border: 1px solid $blue;
     margin-top: -.1rem;
     margin-left: .2rem;
+    cursor: pointer;
   }
   .food-number{
     @include sc(.9rem, #666);

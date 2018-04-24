@@ -1,3 +1,4 @@
+import { baseUrl } from '@/config'
 export const shop1 = {
     //shop id
     id: 1,
@@ -17,7 +18,8 @@ export const shop1 = {
     category: 'Cake',
     //shop identification, license for selling
     //shop image
-    image: '/static/shops/shop.jpeg',
+    image: baseUrl+'static/shops/shop1.jpeg',
+    brand: baseUrl+'static/shops/brand1.png',
     //shop location
 	latitude: 101,
 	longitude: 38,
