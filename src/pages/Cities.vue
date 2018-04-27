@@ -5,10 +5,10 @@
   <!-- currently picked city -->
   <div class="current">
     <span>Your Location:</span>
-    <span>If not correct, please pick bellow</span>
+    <span>If not correct, please pick from bellow</span>
   </div>
   <div class="location" @click="goSearch">
-    <span>Richmond</span>
+    <span>{{ address }}</span>
     <span><i class="fas fa-chevron-right"></i></span>
   </div>
   <!-- list of popular cities -->
@@ -22,8 +22,12 @@
   <div class="cities">
     <div class="cities-title">All Cities <span>(ordered by alphabet)</span></div>
     <ul class="cities-list">
-      <li class="list-item">
-        <ul class="cities-details">
+      <li class="list-item" v-for="item in sortedall" :key="item.id">
+        <div class="item-alphabet">{{ item | alpha }}</div>
+        <ul class="item-details">
+          <li v-for="city in item" :key="city.id" @click="goCity(city)">
+            {{ city }}
+          </li>
         </ul>
       </li>
     </ul>
@@ -31,27 +35,114 @@
 </div>
 </template>
 <script>
+import { mapMutations, mapState } from 'vuex'
 import navHeader from '@/components/common/NavHeader'
+import { gmapApi } from 'vue2-google-maps'
+import { Toast } from 'mint-ui'
 export default {
   mounted() {
     this.getPopular()
+    this.getAll()
+    this.getInitial()
+    //this.getLocation()
   },
   data() {
     return {
-      currentCity: '',
-      currentId: '',
       popular: [],
-      all: []
+      all: [],
+      sortedall: {},
+      address: ''
+    }
+  },
+  computed: {
+    ...mapState([
+      'location'
+    ]),
+    google: gmapApi
+  },
+  filters: {
+    alpha: function(val) {
+      return val[0].charAt(0)
     }
   },
   methods: {
+    ...mapMutations([
+      'USER_LOCATION', 'GET_LOCATION'
+    ]),
+    getInitial() {
+      this.GET_LOCATION()
+      if(this.location) {
+        this.address = this.location
+      } else {
+        this.getLocation()
+      }
+    },
     getPopular() {
       this.popular = [
         'Richmond', 'Vancouver', 'Coquitlum', 'UBC'
       ]
     },
+    getAll() {
+      this.all = [
+        'Abbotsford', 'Armstrong', 'Burnaby', 'Campbell River', 'Castlegar', 'Chilliwack', 'Colwood', 'Coquitlam'
+      ]
+      this.all.forEach(item => {
+        if(!this.sortedall[item.charAt(0)]) {
+          this.sortedall[item.charAt(0)] = []
+        } 
+        this.sortedall[item.charAt(0)].push(item)
+      })
+      //console.log(this.sortedall)
+    },
     goSearch() {
-      this.$router.push({ name: "Location" })
+      let autoAddress
+      autoAddress = this.address.split(',')[1].slice(1)
+      console.log(autoAddress)
+      this.$router.push({ name: "Location", query: { city: autoAddress }})
+    },
+    goCity(city) {
+      this.$router.push({ name: "Location", query: { city: city }})
+    },
+    getLocation() {
+      if(navigator.geolocation) {
+        navigator.geolocation.getCurrentPosition((position) => {
+          //success handler
+          const latLng = new this.google.maps.LatLng(position.coords.latitude, position.coords.longitude)
+          const geocoder = new this.google.maps.Geocoder()
+          geocoder.geocode({
+            'latLng': latLng
+          }, (result, status) => {
+            if(status == this.google.maps.GeocoderStatus.OK) {
+              if(result[0]) {
+                this.address = result[0].formatted_address
+                this.USER_LOCATION(this.address)
+                //const geometry = result[0].geometry
+                //const center = { lat: geometry.location.lat(), lng: geometry.location.lng() }
+              } else {
+                Toast({
+                  message: 'failed to track your address: ' + status,
+                  position: 'top',
+                  duration: 3000
+                })
+              }
+            }
+          }) 
+        }, () => {
+          //fail handler
+          Toast({
+            message: 'please open GPS and retry',
+            position: 'top',
+            duration: 3000
+          })
+        })
+      } else {
+        //not permitted by user
+        Toast({
+          message: 'please permit app to track your address',
+          position: 'top',
+          duration: 3000
+        })
+      }
     }
   },
   components: {
@@ -111,8 +202,26 @@ export default {
   }
   .cities-list {
     display: flex;
-    flex-wrap: nowrap;
+    flex-direction: column;
     margin: 0.8rem .4rem;
+    .list-item {
+      .item-alphabet {
+        border: .02rem solid #ededed;
+        margin: .5rem .3rem;
+      }
+      .item-details {
+        display: flex;
+        flex-direction: row;
+        flex-wrap: wrap;
+        justify-content: flex-start;
+        li {
+          border: 0.02rem solid #ededed;
+          padding: .5rem;
+          margin: .3rem;
+          color: $blue;
+        }
+      }
+    }
   }
 }
 </style>

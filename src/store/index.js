@@ -17,7 +17,11 @@ const state = {
   //cart id
   cart: null,
   //all items added to cart
-  cartItems: {}
+  cartItems: {},
+  //user location
+  location: '',
+  //location search history
+  locationHistory: []
 }
 
 export default new Vuex.Store({

@@ -6,17 +6,22 @@ import router from './router'
 import store from './store'
 import axios from 'axios'
 import Vuelidate from 'vuelidate'
-import { Swipe, SwipeItem, Tabbar, TabItem } from 'mint-ui'
+import { Swipe, SwipeItem } from 'mint-ui'
 import VueLazyload from 'vue-lazyload'
 import FastClick from 'fastclick'
 import * as VueGoogleMaps from 'vue2-google-maps'
+import BaiduMap from 'vue-baidu-map'
 import 'mint-ui/lib/style.css'
 
+/*
 if ('addEventListener' in document) {
   document.addEventListener('DOMContentLoaded', function() {
-    FastClick.attach(document.body)
+    FastClick.attach(document.body, {
+      excludedNode: '^pac-'
+    })
   }, false)
 }
+*/
 
 Vue.use(Vuelidate)
 Vue.use(VueLazyload, {
@@ -33,10 +38,9 @@ Vue.use(VueGoogleMaps, {
 })
 
 
+
 Vue.component(Swipe.name, Swipe)
 Vue.component(SwipeItem.name, SwipeItem)
-Vue.component(Tabbar.name, Tabbar)
-Vue.component(TabItem.name, TabItem)
 
 Vue.prototype.$http = axios
 Vue.config.productionTip = false
