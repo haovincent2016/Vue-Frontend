@@ -16,20 +16,21 @@
       <span>{{ this.location }}</span>
       <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 15 15" class="location-icon" @click="getLocation">
         <g fill="none" fill-rule="evenodd">
-          <circle cx="7.5" cy="7.5" r="7" stroke="#2395FF"></circle>
-          <path fill="#2395FF" d="M7 0h1v5H7zM7 10h1v5H7zM10 7h5v1h-5zM0 7h5v1H0z"></path>
+          <circle cx="7.5" cy="7.5" r="7" stroke="#f2876f"></circle>
+          <path fill="#f2876f" d="M7 0h1v5H7zM7 10h1v5H7zM10 7h5v1h-5zM0 7h5v1H0z"></path>
         </g>
       </svg>
     </div>
   </section>
   <!-- search history -->
   <section class="history">
-    <div class="history-title">Search History</div>
-    <ul class="history-list">
-      <li v-for="history in locationHistory" :key="history.id">
-        <span @click="replacePlace(history)">{{ history }}</span>
+    <div class="history-title">Search History<i @click="emptyHistory" v-if="showEmpty" class="far fa-trash-alt">empty</i></div>
+    <transition-group name="fade" class="history-list" tag="ul">
+      <li v-for="(history, index) in locationHistory" :key="history">
+        <span class="item" @click="replacePlace(history)">{{ history }}</span>
+        <span class="delete" @click="deleteHistory(index)">delete</span>
       </li>
-    </ul>
+    </transition-group>
   </section>
 </div>
 </template>
@@ -39,12 +40,21 @@ import { Toast } from 'mint-ui'
 import { gmapApi } from 'vue2-google-maps'
 import navHeader from '@/components/common/NavHeader'
 export default {
-  mounted() {
+  created() {
     this.getInitial()
   },
   data() {
     return {
       place: null
+    }
+  },
+  watch: {
+    locationHistory: function(val) {
+      if(val && val.length) {
+        this.showEmpty = true
+      } else {
+        this.showEmpty = false
+      }
     }
   },
   computed: {
@@ -55,11 +65,16 @@ export default {
   },
   methods: {
     ...mapMutations([
-      'USER_LOCATION', 'LOCATION_HISTORY', 'GET_LOCATION', 'GET_LOCATIONS'
+      'USER_LOCATION', 'LOCATION_HISTORY', 'GET_LOCATION', 'GET_LOCATIONS', 'DEL_HISTORY', 'EMPTY_HISTORY'
     ]),
     getInitial() {
       this.GET_LOCATION()
       this.GET_LOCATIONS() 
+      if(this.locationHistory && this.locationHistory.length) {
+        this.showEmpty = true
+      } else {
+        this.showEmpty = false
+      }
     },
     setPlace(place) {
       this.place = place.formatted_address
@@ -76,6 +91,12 @@ export default {
     },
     replacePlace(place) {
       this.USER_LOCATION(place)
+    },
+    deleteHistory(index) {
+      this.DEL_HISTORY(index)
+    },
+    emptyHistory() {
+      this.EMPTY_HISTORY()
     },
     getLocation() {
       if(navigator.geolocation) {
@@ -177,6 +198,15 @@ export default {
     font-size: 1rem;
     color: #666;
     background: #f4f4f4;
+    position: relative;
+    .far {
+      right: 1%;
+      top: 0;
+      position: absolute;
+      color: $orange;
+      font-size: .9rem;
+      padding: .75rem 0;
+    }
   }
   .history-list {
     background: #fff;
@@ -184,10 +214,17 @@ export default {
     li {
       display: flex;
       justify-content: space-between;
+      align-items: center;
       padding: .5rem 0;
       font-size: .8rem;
       color: $blue;
       border-bottom: .05rem dotted #eaeaea;
+      .delete {
+        border: .05rem solid $orange;
+        color: $orange;
+        padding: .3rem .2rem;
+        border-radius: .4rem;
+      }
     }
   }
 }
@@ -207,5 +244,11 @@ export default {
     color: #666;
     margin: 1rem 0;
   }
+}
+.fade-enter-active, .fade-leave-active {
+  transition: opacity .5s;
+}
+.fade-enter, .fade-leave-to {
+  opacity: 0;
 }
 </style>

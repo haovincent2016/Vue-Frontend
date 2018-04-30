@@ -104,7 +104,7 @@
   <transition name="show-popup">
     <div class="specs-popup" v-if="showSpecs">
         <header class="popup-header">
-          <h4 class="header-title">{{selectedFood.name}}</h4>
+          <div class="header-title">{{selectedFood.name}}</div>
           <svg width="16" height="16" xmlns="http://www.w3.org/2000/svg" version="1.1" class="header-cancel" @click="toggleSpecs">
               <line x1="0" y1="0" x2="16" y2="16"  stroke="#666" stroke-width="1.2"/>
               <line x1="0" y1="16" x2="16" y2="0"  stroke="#666" stroke-width="1.2"/>
@@ -585,7 +585,7 @@ shop-cart: 100
       list-style: none;
       margin: 0;
       padding: 0;
-      height: 100vh;
+      //height: 100vh;
       .menu-item {
         padding: 1.1rem .3rem;
         border-bottom: 0.025rem solid #ededed;
@@ -617,7 +617,7 @@ shop-cart: 100
   }
   .list-items {
     width: 80%;
-    height: 100vh;
+    //height: 100vh;
     ul {
       list-style: none;
       margin: 0;
@@ -886,6 +886,7 @@ shop-cart: 100
   ul {
     list-style: none;
     padding: 0;
+    margin-bottom: .9rem;
     .list-item {
       display: flex;
       justify-content: space-between;
@@ -942,6 +943,7 @@ shop-cart: 100
   left: 15%;
   width: 70%;
   background-color: #fff;
+  color: $grey;
   z-index: 90;
   border: 1px;
   border-radius: 0.3rem;
@@ -951,13 +953,13 @@ shop-cart: 100
     text-align: center;
     display: flex;
     align-items: center;
-    height: 2rem;
+    height: 2.2rem;
     justify-content: center;
   }
   .detail-cancel {
     position: absolute;
     right: .5rem;
-    top: .5rem;
+    top: .6rem;
   }
   .detail-content {
     text-align: center;
@@ -988,7 +990,8 @@ shop-cart: 100
   //box-shadow: 1px 1px 2px #ccc;
   .popup-header {
     .header-title {
-      @include sc(.9rem, #222);
+      @include sc(1rem, #222);
+      margin: .5rem;
       font-weight: normal;
       text-align: center;
     }
@@ -999,7 +1002,7 @@ shop-cart: 100
     }
   }
   .popup-content {
-    margin-bottom: 1rem;
+    margin: 1rem 0;
     ul {
       display: flex;
       justify-content: center;
@@ -1026,7 +1029,7 @@ shop-cart: 100
 	  justify-content: space-between;
     align-items: center;
     background-color: $whitegrey;
-    padding: 0.5rem;
+    padding: 0.4rem;
     border: 1px;
     border-bottom-left-radius: .2rem;
     border-bottom-right-radius: .2rem;

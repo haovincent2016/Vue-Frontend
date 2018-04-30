@@ -1,4 +1,15 @@
-import { ADD_CART, REMOVE_CART, CLEAR_CART, GET_CART, USER_LOCATION, LOCATION_HISTORY, GET_LOCATION, GET_LOCATIONS } from './mutation-types'
+import { 
+  ADD_CART, 
+  REMOVE_CART, 
+  CLEAR_CART, 
+  GET_CART, 
+  USER_LOCATION, 
+  LOCATION_HISTORY,
+  GET_LOCATION, 
+  GET_LOCATIONS,
+  DEL_HISTORY,
+  EMPTY_HISTORY 
+} from './mutation-types'
 
 export default {
   //get data from localstorage
@@ -72,13 +83,23 @@ export default {
   //get location search history
   [GET_LOCATIONS](state) {
     let history = window.localStorage.getItem('location_history')
-    if(history.length) {
+    if(history) {
       state.locationHistory = JSON.parse(history)
     }
   },
-  //location search history
+  //add location to search history
   [LOCATION_HISTORY](state, location) {
     state.locationHistory.push(location)
     window.localStorage.setItem('location_history', JSON.stringify(state.locationHistory))
+  },
+  //delete location from search history
+  [DEL_HISTORY](state, index) {
+    state.locationHistory.splice(index, 1)
+    window.localStorage.setItem('location_history', JSON.stringify(state.locationHistory))
+  },
+  //
+  [EMPTY_HISTORY](state, index) {
+    state.locationHistory = []
+    window.localStorage.setItem('location_history', state.locationHistory)
   }
 }

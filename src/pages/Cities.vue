@@ -96,8 +96,13 @@ export default {
     },
     goSearch() {
       let autoAddress
-      autoAddress = this.address.split(',')[1].slice(1)
-      console.log(autoAddress)
+      if(this.address && this.address.split(',').length > 3) {
+        autoAddress = this.address.split(',')[1].slice(1)
+      } else if(this.address.split(',').length > 0) {
+        autoAddress = this.address
+      } else {
+        autoAddress = ''
+      }
       this.$router.push({ name: "Location", query: { city: autoAddress }})
     },
     goCity(city) {
@@ -121,7 +126,6 @@ export default {
               } else {
                 Toast({
                   message: 'failed to track your address: ' + status,
-                  position: 'top',
                   duration: 3000
                 })
               }
@@ -131,7 +135,6 @@ export default {
           //fail handler
           Toast({
             message: 'please open GPS and retry',
-            position: 'top',
             duration: 3000
           })
         })
@@ -139,7 +142,6 @@ export default {
         //not permitted by user
         Toast({
           message: 'please permit app to track your address',
-          position: 'top',
           duration: 3000
         })
       }

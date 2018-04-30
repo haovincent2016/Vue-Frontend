@@ -37,13 +37,28 @@ Vue.use(VueGoogleMaps, {
   }
 })
 
-
-
 Vue.component(Swipe.name, Swipe)
 Vue.component(SwipeItem.name, SwipeItem)
 
 Vue.prototype.$http = axios
 Vue.config.productionTip = false
+
+router.beforeEach((to, from, next)=> {
+  if(to.matched.some(record => record.meta.requiresAuth)) {
+    // this route requires auth, check if logged in
+    // if not, redirect to login page.
+    if (!store.state.isLogin) {
+      next({
+        path: '/login',
+        query: { redirect: to.path }
+      })
+    } else {
+      next()
+    }
+  } else {
+    next()
+  }
+})
 
 /* eslint-disable no-new */
 new Vue({

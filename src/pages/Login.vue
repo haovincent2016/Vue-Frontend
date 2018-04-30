@@ -30,16 +30,16 @@
   <!-- username/password login -->
   <form v-if="selected === 2">
     <section class="form-name">
-      <input type="text" placeholder="Username">
+      <input type="text" placeholder="Username" v-model="username">
     </section>
     <section class="form-password">
-      <input v-if="mode" placeholder="Password" type="password">
-      <input v-else placeholder="Password" type="text">
+      <input v-if="mode" placeholder="Password" type="password" v-model="password">
+      <input v-else placeholder="Password" type="text" v-model="password">
       <div class="switch-mode" @click="toggleMode" :class="{ highlight: !mode }">
         <div class="switch-button" :class="{ slide: !mode }"></div>
       </div>
     </section>
-    <button class="submit">Login</button>
+    <button class="submit" @click="loginUser">Login</button>
   </form>
   <a href="javascript:;" class="about-us">About Us</a>
 </div>
@@ -52,12 +52,16 @@ export default {
       selected: 1,
       mobile: '',
       code: '',
-      mode: true
+      mode: true,
+      username: '',
+      password: ''
     }
   },
   methods: {
     toggleMode() {
       this.mode = !this.mode
+    },
+    loginUser() {
     }
   },
   components: {
